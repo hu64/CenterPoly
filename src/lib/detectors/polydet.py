@@ -2,9 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import cv2
 import numpy as np
-from progress.bar import Bar
 import time
 import torch
 
@@ -13,13 +11,9 @@ try:
 except:
   print('NMS not imported! If you need it,'
         ' do \n cd $CenterNet_ROOT/src/lib/external \n make')
-from models.decode import ctdet_decode
+from models.decode import polydet_decode
 from models.utils import flip_tensor
-from utils.image import get_affine_transform
-from utils.post_process import ctdet_post_process
-from utils.post_process import ctdet_post_process_seg
-from utils.debugger import Debugger
-
+from utils.post_process import polydet_post_process
 from .base_detector import BaseDetector
 
 class PolydetDetector(BaseDetector):
@@ -31,7 +25,7 @@ class PolydetDetector(BaseDetector):
       output = self.model(images)[-1]
       hm = output['hm'].sigmoid_()
       wh = output['wh']
-      tlbr = output['tlbr']
+      polys = output['poly']
       reg = output['reg'] if self.opt.reg_offset else None
       if self.opt.flip_test:
         hm = (hm[0:1] + flip_tensor(hm[1:2])) / 2
@@ -39,7 +33,7 @@ class PolydetDetector(BaseDetector):
         reg = reg[0:1] if reg is not None else None
       torch.cuda.synchronize()
       forward_time = time.time()
-      dets, polys = ctdet_decode(hm, wh, tlbr=tlbr, reg=reg, cat_spec_wh=self.opt.cat_spec_wh, K=self.opt.K)
+      dets, polys = polydet_decode(hm, wh, polys, reg=reg, cat_spec_wh=self.opt.cat_spec_wh, K=self.opt.K)
 
     if return_time:
       return output, dets, forward_time, polys
@@ -50,13 +44,11 @@ class PolydetDetector(BaseDetector):
     dets = dets.detach().cpu().numpy()
     polys = polys.detach().cpu().numpy()
     dets = dets.reshape(1, -1, dets.shape[2])
-    dets, polys = ctdet_post_process(
-        dets.copy(), [meta['c']], [meta['s']],
-        meta['out_height'], meta['out_width'], self.opt.num_classes, quads= polys.copy())
+    dets, polys = polydet_post_process(
+        dets.copy(), polys.copy(), [meta['c']], [meta['s']],
+        meta['out_height'], meta['out_width'], self.opt.num_classes)
     for j in range(1, self.num_classes + 1):
       dets[0][j] = np.array(dets[0][j], dtype=np.float32).reshape(-1, 5)
-      # print(dets[0][j].shape)
-      # exit()
       dets[0][j][:, :4] /= scale
     if polys is not None:
       polys[0][:, :self.opt.nbr_points * 2] /= scale

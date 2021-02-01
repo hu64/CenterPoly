@@ -24,15 +24,6 @@ def transform_preds(coords, center, scale, output_size):
     return target_coords
 
 
-def transform_seg(seg, center, scale, output_size):
-    trans = get_affine_transform(center, scale, 0, (512, 512), inv=1)
-    # print('TRANS SHAPE: ', trans.shape)
-    # print('SEG SHAPE: ', seg.shape)
-    seg = cv2.warpAffine(seg, trans, (320, 240), flags=cv2.INTER_LINEAR)
-    # seg = cv2.warpAffine(seg, trans, (1024, 540), flags=cv2.INTER_LINEAR)
-    # seg = cv2.warpAffine(seg, trans, (960, 540), flags=cv2.INTER_LINEAR)
-    return seg
-
 def get_affine_transform(center,
                          scale,
                          rot,

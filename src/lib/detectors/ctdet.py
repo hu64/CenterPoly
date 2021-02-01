@@ -17,7 +17,6 @@ from models.decode import ctdet_decode
 from models.utils import flip_tensor
 from utils.image import get_affine_transform
 from utils.post_process import ctdet_post_process
-from utils.post_process import ctdet_post_process_seg
 from utils.debugger import Debugger
 
 from .base_detector import BaseDetector
