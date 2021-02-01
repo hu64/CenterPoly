@@ -131,7 +131,7 @@ class BaseDetector(object):
       pre_process_time = time.time()
       pre_time += pre_process_time - scale_start_time
 
-      output, dets, forward_time, polys = self.process(images, return_time=True)
+      output, dets, forward_time = self.process(images, return_time=True)
 
       torch.cuda.synchronize()
       net_time += forward_time - pre_process_time
@@ -140,15 +140,11 @@ class BaseDetector(object):
 
       if self.opt.debug >= 2:
         self.debug(debugger, images, dets, output, scale)
-          
-      if polys is not None:
-        dets, polys = self.post_process(dets, meta, scale, polys)
-      else:
-        dets = self.post_process(dets, meta, scale)
+
+      dets = self.post_process(dets, meta, scale)
       torch.cuda.synchronize()
       post_process_time = time.time()
       post_time += post_process_time - decode_time
-
       detections.append(dets)
 
     results = self.merge_outputs(detections)
@@ -159,11 +155,6 @@ class BaseDetector(object):
 
     if self.opt.debug >= 1:
       self.show_results(debugger, image, results)
-    if polys is not None:
-      return {'results': results, 'tot': tot_time, 'load': load_time,
-              'pre': pre_time, 'net': net_time, 'dec': dec_time,
-              'post': post_time, 'merge': merge_time, 'polys': polys}
-    else:
-      return {'results': results, 'tot': tot_time, 'load': load_time,
-              'pre': pre_time, 'net': net_time, 'dec': dec_time,
-              'post': post_time, 'merge': merge_time}
+    return {'results': results, 'tot': tot_time, 'load': load_time,
+            'pre': pre_time, 'net': net_time, 'dec': dec_time,
+            'post': post_time, 'merge': merge_time}

@@ -33,27 +33,26 @@ class PolydetDetector(BaseDetector):
         reg = reg[0:1] if reg is not None else None
       torch.cuda.synchronize()
       forward_time = time.time()
-      dets, polys = polydet_decode(hm, wh, polys, reg=reg, cat_spec_wh=self.opt.cat_spec_wh, K=self.opt.K)
+      dets = polydet_decode(hm, wh, polys, reg=reg, cat_spec_wh=self.opt.cat_spec_wh, K=self.opt.K)
 
     if return_time:
-      return output, dets, forward_time, polys
+      return output, dets, forward_time
     else:
       return output, dets, polys
 
-  def post_process(self, dets, meta, scale=1, polys=None):
+  def post_process(self, dets, meta, scale=1):
     dets = dets.detach().cpu().numpy()
-    polys = polys.detach().cpu().numpy()
     dets = dets.reshape(1, -1, dets.shape[2])
-    dets, polys = polydet_post_process(
-        dets.copy(), polys.copy(), [meta['c']], [meta['s']],
+    dets = polydet_post_process(
+        dets.copy(), [meta['c']], [meta['s']],
         meta['out_height'], meta['out_width'], self.opt.num_classes)
+    length = len(dets[0][1][0])
     for j in range(1, self.num_classes + 1):
-      dets[0][j] = np.array(dets[0][j], dtype=np.float32).reshape(-1, 5)
+      dets[0][j] = np.array(dets[0][j], dtype=np.float32).reshape(-1, length)
       dets[0][j][:, :4] /= scale
-    if polys is not None:
-      polys[0][:, :self.opt.nbr_points * 2] /= scale
+      dets[0][j][:, 5:] /= scale
 
-    return dets[0], polys
+    return dets[0]
 
   def merge_outputs(self, detections):
     results = {}

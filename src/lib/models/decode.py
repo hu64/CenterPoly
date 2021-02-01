@@ -535,9 +535,9 @@ def polydet_decode(heat, wh, polys, reg=None, cat_spec_wh=False, K=100):
                         xs + wh[..., 0:1] / 2,
                         ys + wh[..., 1:2] / 2], dim=2)
 
-    detections = torch.cat([bboxes, scores, clses], dim=2)
+    detections = torch.cat([bboxes, scores, clses, polys_points], dim=2)
 
-    return detections, polys_points
+    return detections
 
 
 def multi_pose_decode(

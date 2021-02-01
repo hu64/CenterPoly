@@ -87,8 +87,8 @@ class CITYSCAPES(data.Dataset):
                         "score": float("{:.2f}".format(score))
                     }
                     if len(bbox) > 5:
-                        extreme_points = list(map(self._to_float, bbox[5:13]))
-                        detection["extreme_points"] = extreme_points
+                        polys = list(map(self._to_float, bbox[5:]))
+                        detection["polygons"] = polys
                     detections.append(detection)
         return detections
 
@@ -104,8 +104,8 @@ class CITYSCAPES(data.Dataset):
         # detections  = self.convert_eval_format(results)
         # json.dump(detections, open(result_json, "w"))
         self.save_results(results, save_dir)
-        coco_dets = self.coco.loadRes('{}/results.json'.format(save_dir))
-        coco_eval = COCOeval(self.coco, coco_dets, "bbox")
-        coco_eval.evaluate()
-        coco_eval.accumulate()
-        coco_eval.summarize()
+        # coco_dets = self.coco.loadRes('{}/results.json'.format(save_dir))
+        # coco_eval = COCOeval(self.coco, coco_dets, "bbox")
+        # coco_eval.evaluate()
+        # coco_eval.accumulate()
+        # coco_eval.summarize()
