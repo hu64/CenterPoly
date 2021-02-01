@@ -7,7 +7,7 @@ from pycocotools.cocoeval import COCOeval
 import numpy as np
 import json
 import os
-
+from PIL import Image, ImageDraw
 import torch.utils.data as data
 
 
@@ -92,6 +92,35 @@ class CITYSCAPES(data.Dataset):
                     detections.append(detection)
         return detections
 
+    def format_and_write_to_cityscapes(self, all_bboxes, save_dir):
+        id_to_file = {}
+        anno = json.load(open(self.annot_path))
+        for image in anno['images']:
+            id_to_file[image['id']] = image['file_name']
+
+        masks_dir = os.path.join(save_dir, 'masks')
+        if not os.path.exists(masks_dir):
+            os.mkdir(masks_dir)
+
+        for image_id in all_bboxes:
+            image_name = id_to_file[int(image_id)]
+            text_file = open(os.path.join(save_dir, os.path.basename(image_name).replace('.png', '.txt')), 'w')
+            count = 0
+            for cls_ind in all_bboxes[image_id]:
+                for bbox in all_bboxes[image_id][cls_ind]:
+                    score = str(bbox[4])
+                    label = self.class_name[cls_ind]
+                    polygon = list(map(self._to_float, bbox[5:]))
+                    poly_points = []
+                    for i in range(0, len(polygon)-1, 2):
+                        poly_points.append((polygon[i], polygon[i+1]))
+                    polygon_mask = Image.new('L', (2048, 1024), 0)
+                    ImageDraw.Draw(polygon_mask).polygon(poly_points, outline=0, fill=255)
+                    mask_path = os.path.join(masks_dir, os.path.basename(image_name).replace('.png', '_' + str(count) + '.png'))
+                    polygon_mask.save(mask_path)
+                    text_file.write(mask_path + ' ' + label + ' ' + score + '\n')
+                    count += 1
+
     def __len__(self):
         return self.num_samples
 
@@ -103,6 +132,10 @@ class CITYSCAPES(data.Dataset):
         # result_json = os.path.join(save_dir, "results.json")
         # detections  = self.convert_eval_format(results)
         # json.dump(detections, open(result_json, "w"))
+        res_dir = os.path.join(save_dir, 'results')
+        if not os.path.exists(res_dir):
+            os.mkdir(res_dir)
+        self.format_and_write_to_cityscapes(results, res_dir)
         self.save_results(results, save_dir)
         # coco_dets = self.coco.loadRes('{}/results.json'.format(save_dir))
         # coco_eval = COCOeval(self.coco, coco_dets, "bbox")

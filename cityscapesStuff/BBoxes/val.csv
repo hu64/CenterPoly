@@ -6018,7 +6018,11 @@
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000016_000019_leftImg8bit.png,1523,426,1706,547,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000016_000019_leftImg8bit.png,1646,418,1837,566,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000016_000019_leftImg8bit.png,1754,404,2048,595,car
+/store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000017_000019_leftImg8bit.png,-1,-1,-1,-1,no_object
+/store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000018_000019_leftImg8bit.png,-1,-1,-1,-1,no_object
+/store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000019_000019_leftImg8bit.png,-1,-1,-1,-1,no_object
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000020_000019_leftImg8bit.png,1077,375,1157,572,person
+/store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000021_000019_leftImg8bit.png,-1,-1,-1,-1,no_object
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000022_000019_leftImg8bit.png,1350,578,1395,592,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000022_000019_leftImg8bit.png,1390,583,1434,594,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000022_000019_leftImg8bit.png,1399,573,1415,591,person
@@ -6084,6 +6088,7 @@
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000030_000019_leftImg8bit.png,463,405,612,548,truck
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000031_000019_leftImg8bit.png,776,316,981,479,truck
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000031_000019_leftImg8bit.png,139,434,349,692,bicycle
+/store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000032_000019_leftImg8bit.png,-1,-1,-1,-1,no_object
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000033_000019_leftImg8bit.png,1297,415,1465,471,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000033_000019_leftImg8bit.png,1452,396,1676,496,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000033_000019_leftImg8bit.png,1658,358,1790,515,truck
@@ -6139,6 +6144,7 @@
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000039_000019_leftImg8bit.png,1924,496,2048,687,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000039_000019_leftImg8bit.png,0,289,315,571,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000039_000019_leftImg8bit.png,0,421,48,571,car
+/store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000040_000019_leftImg8bit.png,-1,-1,-1,-1,no_object
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000041_000019_leftImg8bit.png,1339,390,1512,489,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000041_000019_leftImg8bit.png,1378,421,1459,491,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000041_000019_leftImg8bit.png,1204,396,1387,505,car
@@ -6161,11 +6167,13 @@
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000043_000019_leftImg8bit.png,0,375,305,605,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000044_000019_leftImg8bit.png,0,258,437,770,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000044_000019_leftImg8bit.png,1594,349,2048,779,car
+/store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000045_000019_leftImg8bit.png,-1,-1,-1,-1,no_object
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000046_000019_leftImg8bit.png,970,403,1057,473,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000046_000019_leftImg8bit.png,1010,416,1038,475,person
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000047_000019_leftImg8bit.png,1093,380,1263,513,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000047_000019_leftImg8bit.png,1168,388,1245,511,person
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000048_000019_leftImg8bit.png,278,234,576,622,car
+/store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000049_000019_leftImg8bit.png,-1,-1,-1,-1,no_object
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000050_000019_leftImg8bit.png,1295,451,1355,490,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000051_000019_leftImg8bit.png,710,367,893,496,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000051_000019_leftImg8bit.png,708,370,854,530,car

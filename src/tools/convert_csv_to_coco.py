@@ -7,12 +7,12 @@ import json
 import numpy as np
 import cv2
 
-io_dic = { '/store/datasets/cityscapes/train.json':
-            open('/store/datasets/cityscapes/train.csv', 'r').readlines(),
-           '/store/datasets/cityscapes/val.json':
-               open('/store/datasets/cityscapes/val.csv', 'r').readlines(),
-           '/store/datasets/cityscapes/test.json':
-               open('/store/datasets/cityscapes/test.csv', 'r').readlines(),
+io_dic = { '../../cityscapesStuff/BBoxes/train.json':
+            open('../../cityscapesStuff/BBoxes/train.csv', 'r').readlines(),
+           '../../cityscapesStuff/BBoxes/val.json':
+               open('../../cityscapesStuff/BBoxes/val.csv', 'r').readlines(),
+           '../../cityscapesStuff/BBoxes/test.json':
+               open('../../cityscapesStuff/BBoxes/test.csv', 'r').readlines(),
          }
 """
 io_dic = {
@@ -128,6 +128,8 @@ for outputfile in io_dic:
         for ann_ind, box in enumerate(image_to_boxes[path]):
 
             x0, y0, x1, y1, label = int(box[0]), int(box[1]), int(box[2]), int(box[3]), box[4]
+            if label.strip() == 'no_object':
+                continue
 
             if not BINARY:
                 cat_id = cat_ids[label.strip()]
