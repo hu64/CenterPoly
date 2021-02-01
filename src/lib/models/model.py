@@ -2,10 +2,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import torchvision.models as models
 import torch
-import torch.nn as nn
-import os
+
 
 from .networks.msra_resnet import get_pose_net
 from .networks.dlav0 import get_pose_net as get_dlav0
