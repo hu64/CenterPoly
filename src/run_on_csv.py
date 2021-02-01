@@ -1,7 +1,7 @@
 import sys
 import os
-CENTERNET_PATH = '/store/dev/SpotNet2/src/lib/' if os.path.exists('/store/dev/SpotNet2/src/lib/') \
-    else '/home/travail/huper/dev/SpotNet2/src/lib/'
+CENTERNET_PATH = '/store/dev/CenterPoly/src/lib/' if os.path.exists('/store/dev/CenterPoly/src/lib/') \
+    else '/home/travail/huper/dev/CenterPoly/src/lib/'
 sys.path.insert(0, CENTERNET_PATH)
 
 from detectors.detector_factory import detector_factory
@@ -11,43 +11,19 @@ import cv2
 import numpy as np
 from PIL import Image
 
-# class_name = ['__background__', 'bus', 'car', 'others', 'van']
-class_name = ['__background__', 'object']
-
-TASK = 'ctdetWipeNet'
+# class_names = ['__background__', 'bus', 'car', 'others', 'van']
+# class_names = ['__background__', 'object']
+class_names = ['person', 'rider', 'car', 'truck', 'bus', 'caravan', 'trailer', 'train', 'motorcycle', 'bicycle']
+TASK = 'polydet'
 # TASK = 'ctdet'
 
-base_dir = os.path.join('/store/dev/SpotNet2/exp/uadetrac1on10_b/', TASK) if os.path.exists(os.path.join('/store/dev/SpotNet2/exp/uadetrac1on10_b/', TASK)) \
-    else os.path.join('/home/travail/huper/dev/SpotNet2/exp/uadetrac1on10_b/', TASK)
-
-# base_dir = os.path.join('/store/dev/SpotNet2/exp/uadetrac1on10/', TASK) if os.path.exists(os.path.join('/store/dev/SpotNet2/exp/uadetrac1on10/', TASK)) \
-#     else os.path.join('/home/travail/huper/dev/SpotNet2/exp/uadetrac1on10/', TASK)
-
-# base_dir = os.path.join('/store/dev/SpotNet2/exp/uav/', TASK) if os.path.exists(os.path.join('/store/dev/SpotNet2/exp/uav/', TASK)) \
-#     else os.path.join('/home/travail/huper/dev/SpotNet2/exp/uav/', TASK)
-
-# base_dir = '/store/dev/CenterNet/models'
+base_dir = os.path.join('/store/dev/CenterPoly/exp/cityscapes/', TASK)
 exp_id = 'mask-resdcn_50'
-
 model_name = 'model_best.pth'
-# model_name = 'ctdet_coco_hg.pth'
 MODEL_PATH = os.path.join(base_dir, exp_id, model_name)
-# MODEL_PATH = '/store/datasets/UA-DetracResults/exp/ctdet/SpotNet2_ADD_DB_PYFLOW_LR2e6/model_best.pth'
-seg_dir = 'changedetection-raw'
-base_seg_dir = os.path.join(base_dir, exp_id, seg_dir)
-
-# opt = opts().init('{} --load_model {} --arch hourglassSpotnet2 --seg_weight 1 --dataset uadetrac1on10_b --keep_res'.format(TASK, MODEL_PATH).split(' '))
-# opt = opts().init('{} --load_model {} --arch hourglassSpotNetVid --dataset uadetrac1on10_b --keep_res'.format(TASK, MODEL_PATH).split(' '))
-# opt = opts().init('{} --load_model {} --arch hourglassSpotNetVid --dataset uav --keep_res'.format(TASK, MODEL_PATH).split(' '))
-# opt = opts().init('{} --load_model {} --arch hourglass --dataset uadetrac1on10 --keep_res'.format(TASK, MODEL_PATH).split(' '))
-# opt = opts().init('{} --load_model {} --arch hourglassMultiSpot --seg_weight 1 --dataset uadetrac1on10_b --keep_res'.format(TASK, MODEL_PATH).split(' '))
-
-opt = opts().init('{} --load_model {} --arch resdcn_50 --nbr_points 32 --dataset uadetrac1on10_b --keep_res'.format(TASK, MODEL_PATH).split(' '))
-
-
+opt = opts().init('{} --load_model {} --arch hourglass --nbr_points 32 --dataset cityscapes --keep_res'.format(TASK, MODEL_PATH).split(' '))
 detector = detector_factory[opt.task](opt)
-DATASET_DIR = '/store/datasets/UA-Detrac/' if os.path.exists('/store/datasets/UA-Detrac/') \
-    else '/home/travail/huper/datasets/UA-Detrac/'
+DATASET_DIR = '/store/datasets/'
 
 SPLIT = 'test'
 
@@ -69,6 +45,9 @@ elif SPLIT == 'changedetection':
 elif SPLIT == 'ped1':
     source_lines = open('/store/datasets/ped1/csv.csv', 'r').readlines()
     target_file = open(os.path.join(base_dir, exp_id, 'results.csv'), 'w')
+elif SPLIT == 'cityscapes_val':
+    source_lines = open('../cityscapesStuff/BBoxes/val.csv.csv', 'r').readlines()
+    target_file = open(os.path.join(base_dir, exp_id, 'val.csv'), 'w')
 
 if not os.path.exists(base_seg_dir):
     os.mkdir(base_seg_dir)

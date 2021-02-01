@@ -31,31 +31,7 @@ class PrefetchDataset(torch.utils.data.Dataset):
     img_id = self.images[index]
     img_info = self.load_image_func(ids=[img_id])[0]
     img_path = os.path.join(self.img_dir, img_info['file_name'])
-    # print('OPT TASK: ', opt.task)
-    if opt.task == 'ctdetVid' or opt.task == 'ctdetSpotNetVid':
-      N_FRAMES = 11
-      middle = int(N_FRAMES / 2)
-      index = os.path.basename(img_path).replace('.jpg', '').replace('img', '').replace('.JPEG', '')
-      rest = img_path.replace(index + '.jpg', '').replace(os.path.dirname(img_path), '')
-      length = len(index)
-      modulo = '1'
-      for i in range(length):
-        modulo += '0'
-      img_paths = []
-      for i in range(N_FRAMES):
-        new_img_path = os.path.dirname(img_path) \
-                       + rest \
-                       + str((int(index) - (i - middle)) % int(modulo)).zfill(length) + '.jpg'
-        if not os.path.exists(new_img_path):
-          new_img_path = img_path
-        img_paths.append(new_img_path)
-
-      imgs = []
-      for path in img_paths:
-        imgs.append(cv2.imread(path))
-      image = np.concatenate(imgs, -1)
-    else:
-      image = cv2.imread(img_path)
+    image = cv2.imread(img_path)
     images, meta = {}, {}
     for scale in opt.test_scales:
       if opt.task == 'ddd':
@@ -73,12 +49,12 @@ def prefetch_test(opt):
 
   Dataset = dataset_factory[opt.dataset]
   opt = opts().update_dataset_info_and_set_heads(opt, Dataset)
-  print(opt)
+  # print(opt)
   Logger(opt)
   Detector = detector_factory[opt.task]
   
   # hughes
-  if 'coco' in opt.dataset:
+  if 'coco' in opt.dataset or 'cityscapes' in opt.dataset:
     split = 'val' if not opt.trainval else 'test'
   else:
     split = 'test'
@@ -116,10 +92,7 @@ def test(opt):
   print('TASK: ', opt.task)
   Logger(opt)
   Detector = detector_factory[opt.task]
-  
-  # hughes
   split = 'val' if not opt.trainval else 'test'
-  # split = 'test'
   dataset = Dataset(opt, split)
   detector = Detector(opt)
 

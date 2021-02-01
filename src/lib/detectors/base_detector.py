@@ -57,13 +57,11 @@ class BaseDetector(object):
       c = np.array([new_width // 2, new_height // 2], dtype=np.float32)
       s = np.array([inp_width, inp_height], dtype=np.float32)
 
-    # print('IMG SHAPE: ', image.shape)
     trans_input = get_affine_transform(c, s, 0, [inp_width, inp_height])
     resized_image = cv2.resize(image, (new_width, new_height))
     inp_image = cv2.warpAffine(
       resized_image, trans_input, (inp_width, inp_height),
       flags=cv2.INTER_LINEAR)
-    # print('INP IMG SHAPE: ', image.shape)
 
     if inp_image.shape[2] != 3:
       inp_image = inp_image.astype(np.float32)
@@ -133,7 +131,7 @@ class BaseDetector(object):
       pre_process_time = time.time()
       pre_time += pre_process_time - scale_start_time
 
-      output, dets, forward_time, quads = self.process(images, return_time=True)
+      output, dets, forward_time, polys = self.process(images, return_time=True)
 
       torch.cuda.synchronize()
       net_time += forward_time - pre_process_time
@@ -142,17 +140,9 @@ class BaseDetector(object):
 
       if self.opt.debug >= 2:
         self.debug(debugger, images, dets, output, scale)
-
-      # print('SEG PRE: ', seg.shape)
-      seg = None
-      if seg is not None:
-        seg = self.post_process_seg(seg, meta, scale)
-      # print('SEG POST: ', seg.shape)
-
-      # print('META: ', meta)
-      # print('SCALE: ', scale)
-      if quads is not None:
-        dets, quads = self.post_process(dets, meta, scale, quads)
+          
+      if polys is not None:
+        dets, polys = self.post_process(dets, meta, scale, polys)
       else:
         dets = self.post_process(dets, meta, scale)
       torch.cuda.synchronize()
@@ -169,11 +159,11 @@ class BaseDetector(object):
 
     if self.opt.debug >= 1:
       self.show_results(debugger, image, results)
-    if quads is not None:
+    if polys is not None:
       return {'results': results, 'tot': tot_time, 'load': load_time,
               'pre': pre_time, 'net': net_time, 'dec': dec_time,
-              'post': post_time, 'merge': merge_time, 'seg': seg, 'quads': quads}
+              'post': post_time, 'merge': merge_time, 'polys': polys}
     else:
       return {'results': results, 'tot': tot_time, 'load': load_time,
               'pre': pre_time, 'net': net_time, 'dec': dec_time,
-              'post': post_time, 'merge': merge_time, 'seg': seg}
+              'post': post_time, 'merge': merge_time}
