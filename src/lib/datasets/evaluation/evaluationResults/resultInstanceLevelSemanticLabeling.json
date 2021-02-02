@@ -1,0 +1,177 @@
+{
+    "averages": {
+        "allAp": NaN,
+        "allAp50%": NaN,
+        "classes": {
+            "bicycle": {
+                "ap": NaN,
+                "ap50%": NaN
+            },
+            "bus": {
+                "ap": NaN,
+                "ap50%": NaN
+            },
+            "car": {
+                "ap": NaN,
+                "ap50%": NaN
+            },
+            "motorcycle": {
+                "ap": NaN,
+                "ap50%": NaN
+            },
+            "person": {
+                "ap": NaN,
+                "ap50%": NaN
+            },
+            "rider": {
+                "ap": NaN,
+                "ap50%": NaN
+            },
+            "train": {
+                "ap": NaN,
+                "ap50%": NaN
+            },
+            "truck": {
+                "ap": NaN,
+                "ap50%": NaN
+            }
+        }
+    },
+    "distanceThresholds": [
+        Infinity,
+        100.0,
+        50.0
+    ],
+    "instLabels": [
+        "person",
+        "rider",
+        "car",
+        "truck",
+        "bus",
+        "train",
+        "motorcycle",
+        "bicycle"
+    ],
+    "minRegionSizes": [
+        100,
+        1000,
+        1000
+    ],
+    "minStereoDensities": [
+        -Infinity,
+        0.5,
+        0.5
+    ],
+    "overlaps": [
+        0.5,
+        0.55,
+        0.6000000000000001,
+        0.6500000000000001,
+        0.7000000000000002,
+        0.7500000000000002,
+        0.8000000000000003,
+        0.8500000000000003,
+        0.9000000000000004,
+        0.9500000000000004
+    ],
+    "resultApMatrix": [
+        [
+            [
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN
+            ],
+            [
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN
+            ],
+            [
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN
+            ],
+            [
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN
+            ],
+            [
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN
+            ],
+            [
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN
+            ],
+            [
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN
+            ],
+            [
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN,
+                NaN
+            ]
+        ]
+    ]
+}
