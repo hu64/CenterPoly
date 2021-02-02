@@ -36,9 +36,6 @@ def main(opt):
     model, optimizer, start_epoch = load_model(
       model, opt.load_model, optimizer, opt.resume, opt.lr, opt.lr_step)
 
-  # save_model('/store/dev/SpotNet2/exp/uav/ctdetSpotNetVid/fromDetrac/FusionFromDetrac.pth', 0, model, optimizer)
-  # exit()
-
   Trainer = train_factory[opt.task]
   trainer = Trainer(opt, model, optimizer)
   trainer.set_device(opt.gpus, opt.chunk_sizes, opt.device)

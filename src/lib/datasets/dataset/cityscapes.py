@@ -10,7 +10,6 @@ import os
 from PIL import Image, ImageDraw
 import torch.utils.data as data
 
-
 class CITYSCAPES(data.Dataset):
     num_classes = 10
     # default_resolution = [512, 512]
@@ -40,6 +39,7 @@ class CITYSCAPES(data.Dataset):
         # self.max_objs = 1
         self.class_name = [
             '__background__', 'person', 'rider', 'car', 'truck', 'bus', 'caravan', 'trailer', 'train', 'motorcycle', 'bicycle']
+        self.label_to_id = {'person':24, 'rider':25, 'car':26, 'truck':27, 'bus':28, 'caravan':29, 'trailer':30, 'train':31, 'motorcycle':32, 'bicycle':33}
         self._valid_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         self.cat_ids = {v: i for i, v in enumerate(self._valid_ids)}
         self.voc_color = [(v // 32 * 64 + 64, (v // 8) % 4 * 64, v % 8 * 32) \
@@ -110,15 +110,15 @@ class CITYSCAPES(data.Dataset):
                 for bbox in all_bboxes[image_id][cls_ind]:
                     score = str(bbox[4])
                     label = self.class_name[cls_ind]
-                    polygon = list(map(self._to_float, bbox[5:]))
+                    polygon = list(map(self._to_float, bbox[6:]))
                     poly_points = []
                     for i in range(0, len(polygon)-1, 2):
-                        poly_points.append((polygon[i], polygon[i+1]))
+                        poly_points.append((int(polygon[i]), int(polygon[i+1])))
                     polygon_mask = Image.new('L', (2048, 1024), 0)
                     ImageDraw.Draw(polygon_mask).polygon(poly_points, outline=0, fill=255)
                     mask_path = os.path.join(masks_dir, os.path.basename(image_name).replace('.png', '_' + str(count) + '.png'))
                     polygon_mask.save(mask_path)
-                    text_file.write(mask_path + ' ' + label + ' ' + score + '\n')
+                    text_file.write('masks/' + os.path.basename(mask_path) + ' ' + str(self.label_to_id[label]) + ' ' + score + '\n')
                     count += 1
 
     def __len__(self):

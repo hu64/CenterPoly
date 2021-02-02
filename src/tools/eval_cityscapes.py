@@ -7,7 +7,7 @@ def eval_cityscapes(res_dir):
     from cityscapesscripts.evaluation import evalInstanceLevelSemanticLabeling
     # os.system('pwd')
     # os.system('python cityscapesscripts/evaluation/evalInstanceLevelSemanticLabeling.py')
-    evalInstanceLevelSemanticLabeling.main()
+    print('AP: ', evalInstanceLevelSemanticLabeling.getAP())
 
 eval_cityscapes('/usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/hg_32pts/results')
 
