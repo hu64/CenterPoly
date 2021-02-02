@@ -3,12 +3,12 @@ from __future__ import division
 from __future__ import print_function
 
 import pycocotools.coco as coco
-from pycocotools.cocoeval import COCOeval
 import numpy as np
 import json
 import os
 from PIL import Image, ImageDraw
 import torch.utils.data as data
+
 
 class CITYSCAPES(data.Dataset):
     num_classes = 10
@@ -136,7 +136,12 @@ class CITYSCAPES(data.Dataset):
         if not os.path.exists(res_dir):
             os.mkdir(res_dir)
         self.format_and_write_to_cityscapes(results, res_dir)
-        self.save_results(results, save_dir)
+        # self.save_results(results, save_dir)
+        os.environ['CITYSCAPES_DATASET'] = '/store/datasets/cityscapes'
+        os.environ['CITYSCAPES_RESULTS'] = res_dir
+        from datasets.evaluation.cityscapesscripts.evaluation import evalInstanceLevelSemanticLabeling
+        AP = evalInstanceLevelSemanticLabeling.getAP()
+        return AP
         # coco_dets = self.coco.loadRes('{}/results.json'.format(save_dir))
         # coco_eval = COCOeval(self.coco, coco_dets, "bbox")
         # coco_eval.evaluate()

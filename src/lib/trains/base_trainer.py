@@ -9,9 +9,9 @@ from models.data_parallel import DataParallel
 from utils.utils import AverageMeter
 
 
-class ModleWithLoss(torch.nn.Module):
+class ModelWithLoss(torch.nn.Module):
   def __init__(self, model, loss):
-    super(ModleWithLoss, self).__init__()
+    super(ModelWithLoss, self).__init__()
     self.model = model
     self.loss = loss
   
@@ -28,7 +28,7 @@ class BaseTrainer(object):
     self.opt = opt
     self.optimizer = optimizer
     self.loss_stats, self.loss = self._get_losses(opt)
-    self.model_with_loss = ModleWithLoss(model, self.loss)
+    self.model_with_loss = ModelWithLoss(model, self.loss)
     
     # for name, param in model.named_parameters():
     #   if param.requires_grad:
@@ -89,6 +89,7 @@ class BaseTrainer(object):
         avg_loss_stats[l].update(
           loss_stats[l].mean().item(), batch['input'].size(0))
         Bar.suffix = Bar.suffix + '|{} {:.4f} '.format(l, avg_loss_stats[l].avg)
+
       if not opt.hide_data_time:
         Bar.suffix = Bar.suffix + '|Data {dt.val:.3f}s({dt.avg:.3f}s) ' \
           '|Net {bt.avg:.3f}s'.format(dt=data_time, bt=batch_time)
@@ -101,7 +102,7 @@ class BaseTrainer(object):
       if opt.debug > 0:
         self.debug(batch, output, iter_id)
       
-      if opt.test:
+      if opt.test or (opt.dataset == 'cityscapes' and phase == 'val'):
         self.save_result(output, batch, results)
       del output, loss, loss_stats
     
