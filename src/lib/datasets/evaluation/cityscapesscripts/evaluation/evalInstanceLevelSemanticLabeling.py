@@ -76,7 +76,6 @@ def getPrediction( groundTruthFile , args ):
 
         if not os.path.isdir(rootPath):
             printError("Could not find a result root folder. Please read the instructions of this method.")
-
         args.predictionPath = os.path.abspath(rootPath)
 
     # walk the prediction path, if not happened yet
@@ -722,24 +721,14 @@ def getAP():
     predictionImgList = []
     groundTruthImgList = []
 
-    # the image lists can either be provided as arguments
-    if (len(argv) > 3):
-        for arg in argv:
-            if ("gt" in arg or "groundtruth" in arg):
-                groundTruthImgList.append(arg)
-            elif ("pred" in arg):
-                predictionImgList.append(arg)
-    # however the no-argument way is prefered
-    elif len(argv) == 0:
-        # use the ground truth search string specified above
-        groundTruthImgList = glob.glob(args.groundTruthSearch)
-        if not groundTruthImgList:
-            printError("Cannot find any ground truth images to use for evaluation. Searched for: {}".format(
-                args.groundTruthSearch))
-        # get the corresponding prediction for each ground truth imag
-        for gt in groundTruthImgList:
-            predictionImgList.append(getPrediction(gt, args))
-
+    # use the ground truth search string specified above
+    groundTruthImgList = glob.glob(args.groundTruthSearch)
+    if not groundTruthImgList:
+        printError("Cannot find any ground truth images to use for evaluation. Searched for: {}".format(
+            args.groundTruthSearch))
+    # get the corresponding prediction for each ground truth imag
+    for gt in groundTruthImgList:
+        predictionImgList.append(getPrediction(gt, args))
     # print some info for user
     # print("Note that this tool uses the file '{}' to cache the ground truth instances.".format(args.gtInstancesFile))
     # print("If anything goes wrong, or if you change the ground truth, please delete the file.")

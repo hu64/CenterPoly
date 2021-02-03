@@ -7,10 +7,10 @@ import cv2
 import numpy as np
 
 # from cityscapes scripts, thee labels have instances:
-have_instances = ['person', 'rider', 'car', 'truck', 'bus', 'caravan', 'trailer', 'train', 'motorcycle', 'bicycle']
+have_instances = ['person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle']
 sets = 'train', 'val'
 for data_set in sets:
-    for filename in sorted(glob.glob('../gtFine/' + data_set + '/*/*.json', recursive=True)):
+    for filename in sorted(glob.glob('/store/datasets/cityscapes/gtFine/' + data_set + '/*/*.json', recursive=True)):
         img_path = filename.replace('gtFine', 'leftImg8bit').replace('json', 'png').replace('_polygons', '')
         # print(img_path)
         w, h, c = cv2.imread(img_path).shape

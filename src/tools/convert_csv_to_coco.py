@@ -94,7 +94,7 @@ def _bbox_to_coco_bbox(bbox):
           (bbox[2] - bbox[0]), (bbox[3] - bbox[1])]
 
 # cats = ['bus', 'car', 'others', 'van']
-cats = ['person', 'rider', 'car', 'truck', 'bus', 'caravan', 'trailer', 'train', 'motorcycle', 'bicycle']
+cats = ['person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle']
 cat_ids = {cat: i + 1 for i, cat in enumerate(cats)}
 cat_info = []
 for i, cat in enumerate(cats):

@@ -5,7 +5,7 @@ import csv
 
 
 # from cityscapes scripts, thee labels have instances:
-have_instances = ['person', 'rider', 'car', 'truck', 'bus', 'caravan', 'trailer', 'train', 'motorcycle', 'bicycle']
+have_instances = ['person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle']
 def polygon_to_box(polygon):
     x0 = x1 = polygon[0][0]
     y0 = y1 = polygon[0][1]

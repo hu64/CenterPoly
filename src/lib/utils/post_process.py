@@ -104,19 +104,14 @@ def polydet_post_process(dets, c, s, h, w, num_classes):
   ret = []
   for i in range(dets.shape[0]):
     top_preds = {}
-    dets[i, :, :2] = transform_preds(
-          dets[i, :, 0:2], c[i], s[i], (w, h))
-    dets[i, :, 2:4] = transform_preds(
-          dets[i, :, 2:4], c[i], s[i], (w, h))
-    for j in range(6, dets.shape[-1], 2):
+    for j in range(2, dets.shape[-1], 2):
       dets[i, :, j:j+2] = transform_preds(dets[i, :, j:j+2], c[i], s[i], (w, h))
-    classes = dets[i, :, 5]
+    classes = dets[i, :, 1]
     for j in range(num_classes):
       inds = (classes == j)
       top_preds[j + 1] = np.concatenate([
-        dets[i, inds, :4].astype(np.float32),
-        dets[i, inds, 4:5].astype(np.float32),
-        dets[i, inds, 5:].astype(np.float32)], axis=1).tolist()
+        dets[i, inds, 0:1].astype(np.float32),
+        dets[i, inds, 1:].astype(np.float32)], axis=1).tolist()
     ret.append(top_preds)
   return ret
 

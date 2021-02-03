@@ -11,7 +11,7 @@ import torch.utils.data as data
 
 
 class CITYSCAPES(data.Dataset):
-    num_classes = 10
+    num_classes = 8
     # default_resolution = [512, 512]
     # default_resolution = [1024, 2048]
     default_resolution = [512, 1024]
@@ -38,9 +38,9 @@ class CITYSCAPES(data.Dataset):
         self.max_objs = 128
         # self.max_objs = 1
         self.class_name = [
-            '__background__', 'person', 'rider', 'car', 'truck', 'bus', 'caravan', 'trailer', 'train', 'motorcycle', 'bicycle']
-        self.label_to_id = {'person':24, 'rider':25, 'car':26, 'truck':27, 'bus':28, 'caravan':29, 'trailer':30, 'train':31, 'motorcycle':32, 'bicycle':33}
-        self._valid_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            '__background__', 'person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle']
+        self.label_to_id = {'person':24, 'rider':25, 'car':26, 'truck':27, 'bus':28, 'train':31, 'motorcycle':32, 'bicycle':33}
+        self._valid_ids = [1, 2, 3, 4, 5, 6, 7, 8]
         self.cat_ids = {v: i for i, v in enumerate(self._valid_ids)}
         self.voc_color = [(v // 32 * 64 + 64, (v // 8) % 4 * 64, v % 8 * 32) \
                           for v in range(1, self.num_classes + 1)]
@@ -108,9 +108,9 @@ class CITYSCAPES(data.Dataset):
             count = 0
             for cls_ind in all_bboxes[image_id]:
                 for bbox in all_bboxes[image_id][cls_ind]:
-                    score = str(bbox[4])
+                    score = str(bbox[0])
                     label = self.class_name[cls_ind]
-                    polygon = list(map(self._to_float, bbox[6:]))
+                    polygon = list(map(self._to_float, bbox[2:]))
                     poly_points = []
                     for i in range(0, len(polygon)-1, 2):
                         poly_points.append((int(polygon[i]), int(polygon[i+1])))
@@ -129,21 +129,13 @@ class CITYSCAPES(data.Dataset):
                   open('{}/results.json'.format(save_dir), 'w'))
 
     def run_eval(self, results, save_dir):
-        # result_json = os.path.join(save_dir, "results.json")
-        # detections  = self.convert_eval_format(results)
-        # json.dump(detections, open(result_json, "w"))
+
         res_dir = os.path.join(save_dir, 'results')
         if not os.path.exists(res_dir):
             os.mkdir(res_dir)
         self.format_and_write_to_cityscapes(results, res_dir)
-        # self.save_results(results, save_dir)
         os.environ['CITYSCAPES_DATASET'] = '/store/datasets/cityscapes'
         os.environ['CITYSCAPES_RESULTS'] = res_dir
         from datasets.evaluation.cityscapesscripts.evaluation import evalInstanceLevelSemanticLabeling
         AP = evalInstanceLevelSemanticLabeling.getAP()
         return AP
-        # coco_dets = self.coco.loadRes('{}/results.json'.format(save_dir))
-        # coco_eval = COCOeval(self.coco, coco_dets, "bbox")
-        # coco_eval.evaluate()
-        # coco_eval.accumulate()
-        # coco_eval.summarize()

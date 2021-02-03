@@ -51,7 +51,11 @@ def main(opt):
 
   if opt.test:
     _, preds = trainer.val(0, val_loader)
-    val_loader.dataset.run_eval(preds, opt.save_dir)
+    if opt.dataset == 'cityscapes':
+        AP = val_loader.dataset.run_eval(preds, opt.save_dir)
+        print('AP: ', AP)
+    else:
+        val_loader.dataset.run_eval(preds, opt.save_dir)
     return
 
   train_loader = torch.utils.data.DataLoader(

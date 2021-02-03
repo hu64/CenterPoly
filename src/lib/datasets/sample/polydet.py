@@ -70,7 +70,6 @@ class PolydetDataset(data.Dataset):
     num_objs = min(len(anns), self.max_objs)
     num_points = self.opt.nbr_points
     img = cv2.imread(img_path)
-
     height, width = img.shape[0], img.shape[1]
     edge_img = cv2.resize(cv2.imread(edge_path, 0), (width, height))
 
@@ -134,7 +133,6 @@ class PolydetDataset(data.Dataset):
     hm = np.zeros((num_classes, output_h, output_w), dtype=np.float32)
     wh = np.zeros((self.max_objs, 2), dtype=np.float32)
     poly = np.zeros((self.max_objs, num_points*2), dtype=np.float32)
-    dense_wh = np.zeros((2, output_h, output_w), dtype=np.float32)
     reg = np.zeros((self.max_objs, 2), dtype=np.float32)
     ind = np.zeros((self.max_objs), dtype=np.int64)
     reg_mask = np.zeros((self.max_objs), dtype=np.uint8)
@@ -146,7 +144,6 @@ class PolydetDataset(data.Dataset):
     else:
       draw_gaussian = draw_msra_gaussian if self.opt.mse_loss else draw_umich_gaussian
 
-    gt_det = []
     for k in range(num_objs):
       ann = anns[k]
       bbox = self._coco_box_to_bbox(ann['bbox'])
@@ -162,15 +159,11 @@ class PolydetDataset(data.Dataset):
         radius = gaussian_radius((math.ceil(h), math.ceil(w)))
         radius = max(0, int(radius))
         radius = self.opt.hm_gauss if self.opt.mse_loss else radius
+
         ct = np.array(
           [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2], dtype=np.float32)
         ct_int = ct.astype(np.int32)
-        if self.opt.elliptical_gt:
-          radius_x = radius if h > w else int(radius * (w/h))
-          radius_y = radius if w >= h else int(radius * (h/w))
-          draw_gaussian(hm[cls_id], ct_int, radius_x, radius_y)
-        else:
-          draw_gaussian(hm[cls_id], ct_int, radius)
+
         wh[k] = 1. * w, 1. * h
 
         points_on_box = find_points_from_box(box=bbox, n_points=num_points)
@@ -178,6 +171,13 @@ class PolydetDataset(data.Dataset):
         for point_on_box in points_on_box:
           line = bresenham.bresenham(int(ct[0]), int(ct[1]), int(point_on_box[0]), int(point_on_box[1]))
           points_on_border.append(find_first_zero_pixel(line, edge_img))
+        mass_cx, mass_cy = 0, 0
+        for point_on_border in points_on_border:
+          mass_cx += point_on_border[0]
+          mass_cy += point_on_border[1]
+        ct[0] = mass_cx/len(points_on_border)
+        ct[1] = mass_cy / len(points_on_border)
+        ct_int = ct.astype(int)
 
         if DRAW:
           pts = np.array(points_on_border, np.int32)
@@ -186,40 +186,38 @@ class PolydetDataset(data.Dataset):
           old_inp = cv2.polylines(old_inp, [pts], True, (0, 255, 255))
           old_inp = cv2.rectangle(old_inp, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 0, 255))
 
+        if self.opt.elliptical_gt:
+          radius_x = radius if h > w else int(radius * (w / h))
+          radius_y = radius if w >= h else int(radius * (h / w))
+          draw_gaussian(hm[cls_id], ct_int, radius_x, radius_y)
+        else:
+          draw_gaussian(hm[cls_id], ct_int, radius)
+
         for i, point_on_border in enumerate(points_on_border):
           poly[k][i*2] = point_on_border[0] - ct[0]
           poly[k][i*2 + 1] = point_on_border[1] - ct[1]
+        
 
         ind[k] = ct_int[1] * output_w + ct_int[0]
         reg[k] = ct - ct_int
         reg_mask[k] = 1
         cat_spec_wh[k, cls_id * 2: cls_id * 2 + 2] = wh[k]
         cat_spec_mask[k, cls_id * 2: cls_id * 2 + 2] = 1
-        if self.opt.dense_wh:
-          draw_dense_reg(dense_wh, hm.max(axis=0), ct_int, wh[k], radius)
-        gt_det.append([ct[0] - w / 2, ct[1] - h / 2,
-                       ct[0] + w / 2, ct[1] + h / 2, 1, cls_id])
+
+
 
     if DRAW:
       cv2.imwrite(os.path.join('/store/datasets/cityscapes/test_images/polygons/', img_path.replace('/', '_').replace('.jpg', '_edge.jpg')), cv2.resize(edge_img, (input_w, input_h)))
       cv2.imwrite(os.path.join('/store/datasets/cityscapes/test_images/polygons/', img_path.replace('/', '_')), cv2.resize(old_inp,  (input_w, input_h)))
 
-    ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'wh': wh, 'poly': poly}
+    # ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'wh': wh, 'poly': poly}
+    ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'poly': poly}
 
-    if self.opt.dense_wh:
-      hm_a = hm.max(axis=0, keepdims=True)
-      dense_wh_mask = np.concatenate([hm_a, hm_a], axis=0)
-      ret.update({'dense_wh': dense_wh, 'dense_wh_mask': dense_wh_mask})
-      del ret['wh']
-    elif self.opt.cat_spec_wh:
-      ret.update({'cat_spec_wh': cat_spec_wh, 'cat_spec_mask': cat_spec_mask})
-      del ret['wh']
     if self.opt.reg_offset:
       ret.update({'reg': reg})
     if self.opt.debug > 0 or not self.split == 'train':
       gt_det = np.array(gt_det, dtype=np.float32) if len(gt_det) > 0 else \
                np.zeros((1, 6), dtype=np.float32)
-      meta = {'c': c, 's': s, 'gt_det': gt_det, 'img_id': img_id}
+      meta = {'c': c, 's': s, 'img_id': img_id}
       ret['meta'] = meta
-
     return ret

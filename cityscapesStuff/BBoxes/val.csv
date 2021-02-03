@@ -2113,7 +2113,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_021825_leftImg8bit.png,964,410,983,429,car
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_021825_leftImg8bit.png,977,402,989,436,person
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_023235_leftImg8bit.png,1996,405,2047,499,car
-/store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_023235_leftImg8bit.png,1726,330,2047,505,trailer
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_023235_leftImg8bit.png,1829,387,2001,514,car
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_023235_leftImg8bit.png,0,401,10,492,person
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_023235_leftImg8bit.png,1728,366,1855,521,car
@@ -3167,7 +3166,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_046126_leftImg8bit.png,320,380,343,417,person
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_046126_leftImg8bit.png,865,379,887,435,rider
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_046126_leftImg8bit.png,863,399,886,439,bicycle
-/store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_046272_leftImg8bit.png,1108,352,1168,427,caravan
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_046272_leftImg8bit.png,1005,391,1109,453,car
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_046272_leftImg8bit.png,999,399,1088,458,car
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_046272_leftImg8bit.png,923,393,1046,465,car
@@ -3203,7 +3201,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_046504_leftImg8bit.png,959,380,1019,413,car
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_046504_leftImg8bit.png,973,386,1026,419,car
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_046504_leftImg8bit.png,942,389,981,450,car
-/store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_046504_leftImg8bit.png,765,264,953,490,caravan
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_046504_leftImg8bit.png,1013,382,1078,420,car
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_046504_leftImg8bit.png,1022,391,1066,417,car
 /store/datasets/cityscapes/leftImg8bit/val/frankfurt/frankfurt_000001_046504_leftImg8bit.png,1040,386,1098,424,car
@@ -5877,7 +5874,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000002_000019_leftImg8bit.png,899,430,930,474,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000002_000019_leftImg8bit.png,902,427,965,489,car
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000002_000019_leftImg8bit.png,942,427,1049,511,car
-/store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000002_000019_leftImg8bit.png,962,456,1081,518,trailer
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000002_000019_leftImg8bit.png,398,174,788,571,truck
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000003_000019_leftImg8bit.png,1186,391,1253,491,truck
 /store/datasets/cityscapes/leftImg8bit/val/lindau/lindau_000003_000019_leftImg8bit.png,1836,387,2048,528,car
@@ -6669,7 +6665,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000018_000019_leftImg8bit.png,1902,412,1936,483,person
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000018_000019_leftImg8bit.png,956,314,1065,547,rider
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000018_000019_leftImg8bit.png,938,414,1065,601,bicycle
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000019_000019_leftImg8bit.png,1267,408,1301,450,caravan
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000019_000019_leftImg8bit.png,1245,426,1277,449,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000019_000019_leftImg8bit.png,1226,425,1257,451,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000019_000019_leftImg8bit.png,1209,427,1241,452,car
@@ -6698,7 +6693,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000020_000019_leftImg8bit.png,1351,424,1388,449,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000020_000019_leftImg8bit.png,1310,422,1340,444,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000020_000019_leftImg8bit.png,1289,425,1322,453,car
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000020_000019_leftImg8bit.png,1136,385,1224,467,caravan
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000020_000019_leftImg8bit.png,1119,418,1165,470,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000020_000019_leftImg8bit.png,1076,417,1134,473,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000020_000019_leftImg8bit.png,1047,422,1107,479,car
@@ -6784,7 +6778,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000024_000019_leftImg8bit.png,1769,357,1786,436,person
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000024_000019_leftImg8bit.png,1763,343,1949,443,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000024_000019_leftImg8bit.png,1807,359,1971,455,car
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000024_000019_leftImg8bit.png,1941,250,2048,442,trailer
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000024_000019_leftImg8bit.png,1437,391,1500,419,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000024_000019_leftImg8bit.png,1459,394,1534,451,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000024_000019_leftImg8bit.png,1439,402,1475,456,car
@@ -8064,7 +8057,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000073_000019_leftImg8bit.png,561,434,621,514,bicycle
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000073_000019_leftImg8bit.png,570,432,768,581,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000073_000019_leftImg8bit.png,421,438,478,515,bicycle
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000073_000019_leftImg8bit.png,151,501,517,706,trailer
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000073_000019_leftImg8bit.png,1627,436,1690,532,bicycle
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000073_000019_leftImg8bit.png,1376,414,1661,616,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000073_000019_leftImg8bit.png,1633,353,2048,838,car
@@ -8143,7 +8135,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000078_000019_leftImg8bit.png,1137,338,1158,425,person
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000078_000019_leftImg8bit.png,583,353,738,470,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000078_000019_leftImg8bit.png,879,367,1045,499,car
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000078_000019_leftImg8bit.png,408,378,456,464,trailer
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000078_000019_leftImg8bit.png,324,367,428,472,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000078_000019_leftImg8bit.png,145,338,379,560,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000078_000019_leftImg8bit.png,1,345,318,645,car
@@ -8611,7 +8602,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000097_000019_leftImg8bit.png,862,422,934,589,bicycle
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000097_000019_leftImg8bit.png,1020,425,1086,602,bicycle
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000097_000019_leftImg8bit.png,196,386,451,600,bicycle
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000098_000019_leftImg8bit.png,1047,408,1073,442,caravan
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000098_000019_leftImg8bit.png,1054,420,1075,444,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000098_000019_leftImg8bit.png,1001,416,1015,445,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000098_000019_leftImg8bit.png,836,405,852,425,person
@@ -8648,7 +8638,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000099_000019_leftImg8bit.png,943,422,1000,486,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000099_000019_leftImg8bit.png,1074,425,1106,464,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000099_000019_leftImg8bit.png,1078,433,1106,466,car
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000099_000019_leftImg8bit.png,1099,395,1165,471,caravan
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000099_000019_leftImg8bit.png,1107,429,1128,477,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000099_000019_leftImg8bit.png,1115,422,1184,482,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000099_000019_leftImg8bit.png,922,418,981,512,car
@@ -8740,7 +8729,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000104_000019_leftImg8bit.png,444,427,596,546,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000104_000019_leftImg8bit.png,1303,387,1481,550,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000104_000019_leftImg8bit.png,1381,393,1625,593,car
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000104_000019_leftImg8bit.png,696,390,772,484,trailer
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000104_000019_leftImg8bit.png,120,439,187,530,bicycle
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000104_000019_leftImg8bit.png,140,444,229,570,bicycle
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000104_000019_leftImg8bit.png,2,460,100,623,bicycle
@@ -8967,7 +8955,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000116_000019_leftImg8bit.png,1801,410,1858,467,bicycle
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000116_000019_leftImg8bit.png,1840,420,1929,469,bicycle
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000117_000019_leftImg8bit.png,402,450,436,495,car
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000117_000019_leftImg8bit.png,427,400,569,496,trailer
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000117_000019_leftImg8bit.png,119,454,201,515,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000117_000019_leftImg8bit.png,0,454,140,525,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000117_000019_leftImg8bit.png,1077,412,1107,433,car
@@ -8980,7 +8967,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000118_000019_leftImg8bit.png,1107,378,1120,397,truck
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000118_000019_leftImg8bit.png,1114,389,1126,400,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000118_000019_leftImg8bit.png,1106,396,1120,409,car
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000118_000019_leftImg8bit.png,1353,364,1486,474,trailer
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000118_000019_leftImg8bit.png,1098,412,1148,451,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000118_000019_leftImg8bit.png,1292,414,1322,460,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000118_000019_leftImg8bit.png,1137,335,1299,477,bus
@@ -9038,7 +9024,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000122_000019_leftImg8bit.png,883,407,967,503,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000122_000019_leftImg8bit.png,933,460,969,516,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000122_000019_leftImg8bit.png,826,437,957,538,car
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000122_000019_leftImg8bit.png,1122,480,1160,524,trailer
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000122_000019_leftImg8bit.png,1154,438,1273,535,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000123_000019_leftImg8bit.png,254,499,289,545,bicycle
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000123_000019_leftImg8bit.png,1005,451,1028,475,truck
@@ -9060,7 +9045,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000123_000019_leftImg8bit.png,1155,452,1470,591,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000123_000019_leftImg8bit.png,689,447,754,550,rider
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000123_000019_leftImg8bit.png,702,491,735,584,bicycle
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000124_000019_leftImg8bit.png,729,427,789,483,caravan
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000124_000019_leftImg8bit.png,747,453,794,482,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000124_000019_leftImg8bit.png,771,455,818,483,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000124_000019_leftImg8bit.png,838,440,893,483,car
@@ -9130,7 +9114,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000128_000019_leftImg8bit.png,1226,431,1267,466,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000128_000019_leftImg8bit.png,1322,409,1355,456,truck
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000128_000019_leftImg8bit.png,1316,413,1350,464,car
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000128_000019_leftImg8bit.png,1282,416,1346,475,trailer
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000128_000019_leftImg8bit.png,1447,415,1478,465,person
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000128_000019_leftImg8bit.png,1386,420,1437,475,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000128_000019_leftImg8bit.png,1402,428,1468,477,car
@@ -9169,7 +9152,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000129_000019_leftImg8bit.png,1469,439,1498,494,bicycle
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000129_000019_leftImg8bit.png,1516,380,1556,496,rider
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000129_000019_leftImg8bit.png,1528,438,1550,506,bicycle
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000129_000019_leftImg8bit.png,1192,392,1307,489,trailer
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000130_000019_leftImg8bit.png,1705,383,1746,406,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000130_000019_leftImg8bit.png,1330,343,1552,429,truck
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000130_000019_leftImg8bit.png,1277,394,1374,463,car
@@ -9803,7 +9785,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000152_000019_leftImg8bit.png,1308,408,1318,454,person
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000152_000019_leftImg8bit.png,1296,408,1311,458,person
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000152_000019_leftImg8bit.png,1324,415,1342,464,person
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000152_000019_leftImg8bit.png,1360,391,1462,500,trailer
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000152_000019_leftImg8bit.png,1386,419,1465,518,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000152_000019_leftImg8bit.png,1397,422,1467,546,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000152_000019_leftImg8bit.png,1420,390,1646,591,car
@@ -9825,7 +9806,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000153_000019_leftImg8bit.png,1001,389,1035,426,person
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000153_000019_leftImg8bit.png,991,415,1088,501,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000153_000019_leftImg8bit.png,786,406,1062,499,car
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000153_000019_leftImg8bit.png,1912,190,2048,879,trailer
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000153_000019_leftImg8bit.png,242,407,266,466,person
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000153_000019_leftImg8bit.png,437,433,466,473,bicycle
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000153_000019_leftImg8bit.png,500,396,545,485,rider
@@ -10171,7 +10151,6 @@
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000171_000019_leftImg8bit.png,1028,418,1045,466,person
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000171_000019_leftImg8bit.png,1388,412,1405,473,person
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000171_000019_leftImg8bit.png,738,374,804,466,truck
-/store/datasets/cityscapes/leftImg8bit/val/munster/munster_000171_000019_leftImg8bit.png,712,402,794,476,caravan
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000171_000019_leftImg8bit.png,701,433,769,483,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000171_000019_leftImg8bit.png,0,403,173,623,car
 /store/datasets/cityscapes/leftImg8bit/val/munster/munster_000171_000019_leftImg8bit.png,1049,379,1176,480,bus
