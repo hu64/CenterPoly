@@ -16,12 +16,14 @@ import math
 import bresenham
 
 
-def find_first_zero_pixel(points, edge_image):
+def find_first_different_pixel(points, edge_image):
   points = list(points)
   coord = points[0]
+  center_value = edge_image[coord[1], coord[0]]
+
   for i, pixel in enumerate(points):
     coord = pixel
-    if edge_image[pixel[1], pixel[0]] == 0:
+    if edge_image[pixel[1], pixel[0]] != center_value:
       break
   return coord
 
@@ -62,7 +64,8 @@ class PolydetDataset(data.Dataset):
     if 'Detrac' in img_path:
       edge_path = img_path.replace('images', 'mask')
     elif 'cityscapes' in img_path:
-      edge_path = img_path.replace('leftImg8bit', 'polygons').replace('_polygons', '')
+      edge_path = img_path.replace('leftImg8bit', 'polygons_maskrcnn')
+
     DRAW = False
     ann_ids = self.coco.getAnnIds(imgIds=[img_id])
     anns = self.coco.loadAnns(ids=ann_ids)
@@ -162,7 +165,6 @@ class PolydetDataset(data.Dataset):
 
         ct = np.array(
           [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2], dtype=np.float32)
-        ct_int = ct.astype(np.int32)
 
         wh[k] = 1. * w, 1. * h
 
@@ -170,7 +172,7 @@ class PolydetDataset(data.Dataset):
         points_on_border = []
         for point_on_box in points_on_box:
           line = bresenham.bresenham(int(ct[0]), int(ct[1]), int(point_on_box[0]), int(point_on_box[1]))
-          points_on_border.append(find_first_zero_pixel(line, edge_img))
+          points_on_border.append(find_first_different_pixel(line, edge_img))
         mass_cx, mass_cy = 0, 0
         for point_on_border in points_on_border:
           mass_cx += point_on_border[0]
@@ -216,8 +218,6 @@ class PolydetDataset(data.Dataset):
     if self.opt.reg_offset:
       ret.update({'reg': reg})
     if self.opt.debug > 0 or not self.split == 'train':
-      gt_det = np.array(gt_det, dtype=np.float32) if len(gt_det) > 0 else \
-               np.zeros((1, 6), dtype=np.float32)
       meta = {'c': c, 's': s, 'img_id': img_id}
       ret['meta'] = meta
     return ret
