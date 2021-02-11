@@ -433,3 +433,7 @@ class HourglassNet(exkp):
 def get_large_hourglass_net(num_layers, heads, head_conv):
   model = HourglassNet(heads, 2)
   return model
+
+def get_small_hourglass_net(num_layers, heads, head_conv):
+  model = HourglassNet(heads, 1)
+  return model

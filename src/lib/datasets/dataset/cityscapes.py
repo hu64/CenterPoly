@@ -12,14 +12,10 @@ import torch.utils.data as data
 
 class CITYSCAPES(data.Dataset):
     num_classes = 8
-    # default_resolution = [512, 512]
-    # default_resolution = [1024, 2048]
     default_resolution = [512, 1024]
 
-    mean = np.array([0.40789654, 0.44719302, 0.47026115],
-                    dtype=np.float32).reshape(1, 1, 3)
-    std = np.array([0.28863828, 0.27408164, 0.27809835],
-                   dtype=np.float32).reshape(1, 1, 3)
+    mean = np.array([0.28404999637454165, 0.32266921542410754, 0.2816898182839038], dtype=np.float32).reshape(1, 1, 3)
+    std = np.array([0.04230349568017417, 0.04088212241688149, 0.04269893084955519],dtype=np.float32).reshape(1, 1, 3)
 
     def __init__(self, opt, split):
         super(CITYSCAPES, self).__init__()
@@ -36,7 +32,6 @@ class CITYSCAPES(data.Dataset):
             self.annot_path = os.path.join(base_dir, 'train.json')
 
         self.max_objs = 128
-        # self.max_objs = 1
         self.class_name = [
             '__background__', 'person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle']
         self.label_to_id = {'person':24, 'rider':25, 'car':26, 'truck':27, 'bus':28, 'train':31, 'motorcycle':32, 'bicycle':33}

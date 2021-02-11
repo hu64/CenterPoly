@@ -22,6 +22,7 @@ def polygon_to_box(polygon):
             y1 = y
     return x0, y0, x1, y1
 
+max_objects_per_img = 0
 sets = 'train', 'val', 'test'
 for data_set in sets:
     spamwriter = csv.writer(open('../BBoxes/' + data_set + '.csv', 'w'), delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -37,7 +38,11 @@ for data_set in sets:
                 x0, y0, x1, y1 = polygon_to_box(object['polygon'])
                 spamwriter.writerow((os.path.abspath(filename), x0, y0, x1, y1, label))
                 count += 1
+        if count > max_objects_per_img:
+            max_objects_per_img = count
         if count == 0:
             spamwriter.writerow((os.path.abspath(filename), -1, -1, -1, -1, 'no_object'))
         if data_set == 'test':
             spamwriter.writerow((os.path.abspath(filename), 0, 0, 1, 1, 'car'))
+
+print('max objects: ', max_objects_per_img)

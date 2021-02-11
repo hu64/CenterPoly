@@ -13,4 +13,10 @@ cd src
 
 # python main.py polydet --val_intervals 4 --exp_id hourglass_64pts_nowh_WeSu --poly_weight 1 --elliptical_gt --nbr_points 64 --dataset cityscapes --arch hourglass  --batch_size 2 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
 # python main.py polydet --val_intervals 4 --exp_id hourglass_64pts_nowh_WeSu --poly_weight 1 --elliptical_gt --nbr_points 64 --dataset cityscapes --arch hourglass  --batch_size 2 --master_batch 4 --lr 2e-4 --resume
-python main.py polydet --val_intervals 4 --exp_id hourglass_64pts_pw10_WeSu --poly_weight 10 --elliptical_gt --nbr_points 64 --dataset cityscapes --arch hourglass  --batch_size 2 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+# python main.py polydet --val_intervals 4 --exp_id hourglass_64pts_pw10_WeSu --poly_weight 10 --elliptical_gt --nbr_points 64 --dataset cityscapes --arch hourglass  --batch_size 2 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+
+# python main.py polydet --val_intervals 4 --exp_id hourglass_64pts_pw5_lr1e4_WeSu --poly_weight 5 --elliptical_gt --nbr_points 64 --dataset cityscapes --arch hourglass  --batch_size 2 --master_batch 4 --lr 1e-4 --load_model ../models/ctdet_coco_hg.pth
+# python main.py polydet --val_intervals 4 --exp_id hourglass_64pts_pw5_lr1e4_WeSu --poly_weight 5 --elliptical_gt --nbr_points 64 --dataset cityscapes --arch hourglass  --batch_size 2 --master_batch 4 --lr 1e-4 --resume
+
+python main.py polydet --val_intervals 4 --exp_id test2 --poly_weight 5 --elliptical_gt --nbr_points 64 --dataset cityscapes --arch hourglass  --batch_size 2 --master_batch 4 --lr 1e-4 --load_model ../models/ctdet_coco_hg.pth
+# python main.py polydet --val_intervals 4 --exp_id test2 --poly_weight 5 --elliptical_gt --nbr_points 64 --dataset cityscapes --arch hourglass  --batch_size 2 --master_batch 4 --lr 1e-4 --resume

@@ -61,7 +61,7 @@ class opts(object):
     self.parser.add_argument('--arch', default='dla_34',
                              help='model architecture. Currently tested'
                                   'res_18 | res_101 | resdcn_18 | resdcn_101 |'
-                                  'dlav0_34 | dla_34 | hourglass ')
+                                  'dlav0_34 | dla_34 | hourglass | small_hourglass')
     self.parser.add_argument('--head_conv', type=int, default=-1,
                              help='conv layer channels for output head'
                                   '0 for no conv layer'
@@ -105,7 +105,7 @@ class opts(object):
                              help='multi scale test augmentation.')
     self.parser.add_argument('--nms', action='store_true',
                              help='run nms in testing.')
-    self.parser.add_argument('--K', type=int, default=100,
+    self.parser.add_argument('--K', type=int, default=128,
                              help='max number of output objects.')
     self.parser.add_argument('--not_prefetch_test', action='store_true',
                              help='not use parallal data pre-processing.')
@@ -387,7 +387,7 @@ class opts(object):
                    'mean': [0.408, 0.447, 0.470], 'std': [0.289, 0.274, 0.278],
                    'dataset': 'uadetrac1on10'},
         'polydet': {'default_resolution': [512, 1024], 'num_classes': 8,
-                          'mean': [0.408, 0.447, 0.470], 'std': [0.289, 0.274, 0.278],
+                          'mean': [0.284, 0.323, 0.282], 'std': [0.04, 0.04, 0.04],
                           'dataset': 'uadetrac1on10_b'},
         'ctdetMultiSpot': {'default_resolution': [512, 512], 'num_classes': 1,
                             'mean': [0.408, 0.447, 0.470], 'std': [0.289, 0.274, 0.278],

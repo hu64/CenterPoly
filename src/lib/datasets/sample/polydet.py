@@ -30,18 +30,18 @@ def find_first_different_pixel(points, edge_image):
 
 def find_points_from_box(box, n_points):
   assert n_points % 4 == 0, "n_points should be a multiple of four"  # simpler this way
-  points_per_line = int((n_points / 4))
   x0, y0, x1, y1 = box
-  x_interval = (x1 - x0) / points_per_line
-  y_interval = (y1 - y0) / points_per_line
+  nbr_points = int(n_points/4)
+  x_interval = (x1 - x0) / nbr_points
+  y_interval = (y1 - y0) / nbr_points
   points = []
-  for i in range(points_per_line):
+  for i in range(nbr_points):
     points.append((round(x0 + i * x_interval), y0))
-  for i in range(points_per_line):
+  for i in range(nbr_points):
     points.append((x1, round(y0 + i * y_interval)))
-  for i in range(points_per_line):
+  for i in range(nbr_points):
     points.append((round(x1 - i * x_interval), y1))
-  for i in range(points_per_line):
+  for i in range(nbr_points):
     points.append((x0, round(y1 - i * y_interval)))
   return points
 
