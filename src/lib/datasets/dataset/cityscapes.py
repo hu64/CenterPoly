@@ -8,7 +8,7 @@ import json
 import os
 from PIL import Image, ImageDraw
 import torch.utils.data as data
-
+import glob
 
 class CITYSCAPES(data.Dataset):
     num_classes = 8
@@ -103,18 +103,19 @@ class CITYSCAPES(data.Dataset):
             count = 0
             for cls_ind in all_bboxes[image_id]:
                 for bbox in all_bboxes[image_id][cls_ind]:
-                    score = str(bbox[0])
-                    label = self.class_name[cls_ind]
-                    polygon = list(map(self._to_float, bbox[2:]))
-                    poly_points = []
-                    for i in range(0, len(polygon)-1, 2):
-                        poly_points.append((int(polygon[i]), int(polygon[i+1])))
-                    polygon_mask = Image.new('L', (2048, 1024), 0)
-                    ImageDraw.Draw(polygon_mask).polygon(poly_points, outline=0, fill=255)
-                    mask_path = os.path.join(masks_dir, os.path.basename(image_name).replace('.png', '_' + str(count) + '.png'))
-                    polygon_mask.save(mask_path)
-                    text_file.write('masks/' + os.path.basename(mask_path) + ' ' + str(self.label_to_id[label]) + ' ' + score + '\n')
-                    count += 1
+                    if bbox[0] > 0.05:
+                        score = str(bbox[0])
+                        label = self.class_name[cls_ind]
+                        polygon = list(map(self._to_float, bbox[2:]))
+                        poly_points = []
+                        for i in range(0, len(polygon)-1, 2):
+                            poly_points.append((int(polygon[i]), int(polygon[i+1])))
+                        polygon_mask = Image.new('L', (2048, 1024), 0)
+                        ImageDraw.Draw(polygon_mask).polygon(poly_points, outline=0, fill=255)
+                        mask_path = os.path.join(masks_dir, os.path.basename(image_name).replace('.png', '_' + str(count) + '.png'))
+                        polygon_mask.save(mask_path)
+                        text_file.write('masks/' + os.path.basename(mask_path) + ' ' + str(self.label_to_id[label]) + ' ' + score + '\n')
+                        count += 1
 
     def __len__(self):
         return self.num_samples
@@ -124,10 +125,18 @@ class CITYSCAPES(data.Dataset):
                   open('{}/results.json'.format(save_dir), 'w'))
 
     def run_eval(self, results, save_dir):
-
+        self.save_results(results, save_dir)
         res_dir = os.path.join(save_dir, 'results')
         if not os.path.exists(res_dir):
             os.mkdir(res_dir)
+        to_delete = os.path.join(save_dir, 'results/*.txt')
+        files = glob.glob(to_delete)
+        for f in files:
+            os.remove(f)
+        to_delete = os.path.join(save_dir, 'results/*/*.png')
+        files = glob.glob(to_delete)
+        for f in files:
+            os.remove(f)
         self.format_and_write_to_cityscapes(results, res_dir)
         os.environ['CITYSCAPES_DATASET'] = '/store/datasets/cityscapes'
         os.environ['CITYSCAPES_RESULTS'] = res_dir

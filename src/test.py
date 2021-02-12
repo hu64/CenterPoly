@@ -64,7 +64,6 @@ def prefetch_test(opt):
   data_loader = torch.utils.data.DataLoader(
     PrefetchDataset(opt, dataset, detector.pre_process), 
     batch_size=1, shuffle=False, num_workers=1, pin_memory=True)
-
   results = {}
   num_iters = len(dataset)
   bar = Bar('{}'.format(opt.exp_id), max=num_iters)
@@ -103,12 +102,9 @@ def test(opt):
   avg_time_stats = {t: AverageMeter() for t in time_stats}
 
   for ind in range(num_iters):
-    if ind >= 100:
-      break
     img_id = dataset.images[ind]
     img_info = dataset.coco.loadImgs(ids=[img_id])[0]
     img_path = os.path.join(dataset.img_dir, img_info['file_name'])
-
 
     if opt.task == 'ddd':
       ret = detector.run(img_path, img_info['calib'])

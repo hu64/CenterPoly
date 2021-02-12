@@ -137,6 +137,7 @@ class PolydetDataset(data.Dataset):
     wh = np.zeros((self.max_objs, 2), dtype=np.float32)
     poly = np.zeros((self.max_objs, num_points*2), dtype=np.float32)
     reg = np.zeros((self.max_objs, 2), dtype=np.float32)
+    size_norm = np.zeros((self.max_objs, 1), dtype=np.float32)
     ind = np.zeros((self.max_objs), dtype=np.int64)
     reg_mask = np.zeros((self.max_objs), dtype=np.uint8)
     cat_spec_wh = np.zeros((self.max_objs, num_classes * 2), dtype=np.float32)
@@ -195,10 +196,17 @@ class PolydetDataset(data.Dataset):
         else:
           draw_gaussian(hm[cls_id], ct_int, radius)
 
+        def PolyArea(x, y):
+          return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
+        xs = []
+        ys = []
         for i, point_on_border in enumerate(points_on_border):
           poly[k][i*2] = point_on_border[0] - ct[0]
+          xs.append(point_on_border[0])
           poly[k][i*2 + 1] = point_on_border[1] - ct[1]
-        
+          ys.append(point_on_border[1])
+        size_norm[k] = PolyArea(xs, ys)
+
 
         ind[k] = ct_int[1] * output_w + ct_int[0]
         reg[k] = ct - ct_int
@@ -212,8 +220,7 @@ class PolydetDataset(data.Dataset):
       cv2.imwrite(os.path.join('/store/datasets/cityscapes/test_images/polygons/', img_path.replace('/', '_').replace('.jpg', '_edge.jpg')), cv2.resize(edge_img, (input_w, input_h)))
       cv2.imwrite(os.path.join('/store/datasets/cityscapes/test_images/polygons/', img_path.replace('/', '_')), cv2.resize(old_inp,  (input_w, input_h)))
 
-    # ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'wh': wh, 'poly': poly}
-    ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'poly': poly}
+    ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'poly': poly, 'size_norm': size_norm}
 
     if self.opt.reg_offset:
       ret.update({'reg': reg})

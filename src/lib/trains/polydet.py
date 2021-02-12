@@ -6,7 +6,7 @@ import torch
 import numpy as np
 
 from models.losses import FocalLoss
-from models.losses import RegL1Loss, RegLoss, NormRegL1Loss, RegWeightedL1Loss
+from models.losses import RegL1Loss, RegLoss, RegL1PolyLoss, NormRegL1Loss, RegWeightedL1Loss
 from models.decode import polydet_decode
 from models.utils import _sigmoid
 from utils.debugger import Debugger
@@ -24,7 +24,7 @@ class PolydetLoss(torch.nn.Module):
         # self.crit_wh = torch.nn.L1Loss(reduction='sum') if opt.dense_wh else \
         #     NormRegL1Loss() if opt.norm_wh else \
         #         RegWeightedL1Loss() if opt.cat_spec_wh else self.crit_reg
-        self.crit_poly = self.crit_reg
+        self.crit_poly = RegL1PolyLoss()
         self.opt = opt
 
     def forward(self, outputs, batch):
@@ -66,7 +66,7 @@ class PolydetLoss(torch.nn.Module):
             #             batch['ind'], batch['wh']) / opt.num_stacks
             poly_loss += self.crit_poly(
                 output['poly'], batch['reg_mask'],
-                batch['ind'], batch['poly']) / opt.num_stacks
+                batch['ind'], batch['poly'], batch['size_norm']) / opt.num_stacks
 
             if opt.reg_offset and opt.off_weight > 0:
                 off_loss += self.crit_reg(output['reg'], batch['reg_mask'],

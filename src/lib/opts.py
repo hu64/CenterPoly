@@ -61,7 +61,7 @@ class opts(object):
     self.parser.add_argument('--arch', default='dla_34',
                              help='model architecture. Currently tested'
                                   'res_18 | res_101 | resdcn_18 | resdcn_101 |'
-                                  'dlav0_34 | dla_34 | hourglass | small_hourglass')
+                                  'dlav0_34 | dla_34 | hourglass | smallhourglass')
     self.parser.add_argument('--head_conv', type=int, default=-1,
                              help='conv layer channels for output head'
                                   '0 for no conv layer'
@@ -256,7 +256,7 @@ class opts(object):
     if opt.head_conv == -1: # init default head_conv
       opt.head_conv = 256 if 'dla' in opt.arch else 64
     opt.pad = 127 if 'hourglass' in opt.arch else 31
-    opt.num_stacks = 2 if 'hourglass' in opt.arch else 1
+    opt.num_stacks = 2 if opt.arch == 'hourglass' else 1
 
     if opt.trainval:
       opt.val_intervals = 100000000

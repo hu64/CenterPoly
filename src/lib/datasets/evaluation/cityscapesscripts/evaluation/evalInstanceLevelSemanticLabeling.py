@@ -717,7 +717,7 @@ if __name__ == "__main__":
 def getAP():
     global args
     argv = sys.argv[1:]
-    args.quiet = True
+    args.quiet = False  # True
     predictionImgList = []
     groundTruthImgList = []
 

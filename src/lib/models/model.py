@@ -19,7 +19,7 @@ _model_factory = {
   'dla': get_dla_dcn,
   'resdcn': get_pose_net_dcn,
   'hourglass': get_large_hourglass_net,
-  'small_hourglass': get_small_hourglass_net,
+  'smallhourglass': get_small_hourglass_net,
 }
 
 
