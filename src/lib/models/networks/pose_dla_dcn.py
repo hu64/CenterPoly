@@ -13,7 +13,7 @@ from torch import nn
 import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
 
-from .DCNv2.dcn_v2 import DCN
+# from .DCNv2.dcn_v2 import DCN
 
 BN_MOMENTUM = 0.1
 logger = logging.getLogger(__name__)
@@ -342,75 +342,75 @@ def fill_up_weights(up):
         w[c, 0, :, :] = w[0, 0, :, :]
 
 
-class DeformConv(nn.Module):
-    def __init__(self, chi, cho):
-        super(DeformConv, self).__init__()
-        self.actf = nn.Sequential(
-            nn.BatchNorm2d(cho, momentum=BN_MOMENTUM),
-            nn.ReLU(inplace=True)
-        )
-        self.conv = DCN(chi, cho, kernel_size=(3,3), stride=1, padding=1, dilation=1, deformable_groups=1)
+# class DeformConv(nn.Module):
+#     def __init__(self, chi, cho):
+#         super(DeformConv, self).__init__()
+#         self.actf = nn.Sequential(
+#             nn.BatchNorm2d(cho, momentum=BN_MOMENTUM),
+#             nn.ReLU(inplace=True)
+#         )
+#         self.conv = DCN(chi, cho, kernel_size=(3,3), stride=1, padding=1, dilation=1, deformable_groups=1)
+#
+#     def forward(self, x):
+#         x = self.conv(x)
+#         x = self.actf(x)
+#         return x
 
-    def forward(self, x):
-        x = self.conv(x)
-        x = self.actf(x)
-        return x
+#
+# class IDAUp(nn.Module):
+#
+#     def __init__(self, o, channels, up_f):
+#         super(IDAUp, self).__init__()
+#         for i in range(1, len(channels)):
+#             c = channels[i]
+#             f = int(up_f[i])
+#             proj = DeformConv(c, o)
+#             node = DeformConv(o, o)
+#
+#             up = nn.ConvTranspose2d(o, o, f * 2, stride=f,
+#                                     padding=f // 2, output_padding=0,
+#                                     groups=o, bias=False)
+#             fill_up_weights(up)
+#
+#             setattr(self, 'proj_' + str(i), proj)
+#             setattr(self, 'up_' + str(i), up)
+#             setattr(self, 'node_' + str(i), node)
+#
+#
+#     def forward(self, layers, startp, endp):
+#         for i in range(startp + 1, endp):
+#             upsample = getattr(self, 'up_' + str(i - startp))
+#             project = getattr(self, 'proj_' + str(i - startp))
+#             layers[i] = upsample(project(layers[i]))
+#             node = getattr(self, 'node_' + str(i - startp))
+#             layers[i] = node(layers[i] + layers[i - 1])
+#
 
-
-class IDAUp(nn.Module):
-
-    def __init__(self, o, channels, up_f):
-        super(IDAUp, self).__init__()
-        for i in range(1, len(channels)):
-            c = channels[i]
-            f = int(up_f[i])  
-            proj = DeformConv(c, o)
-            node = DeformConv(o, o)
-     
-            up = nn.ConvTranspose2d(o, o, f * 2, stride=f, 
-                                    padding=f // 2, output_padding=0,
-                                    groups=o, bias=False)
-            fill_up_weights(up)
-
-            setattr(self, 'proj_' + str(i), proj)
-            setattr(self, 'up_' + str(i), up)
-            setattr(self, 'node_' + str(i), node)
-                 
-        
-    def forward(self, layers, startp, endp):
-        for i in range(startp + 1, endp):
-            upsample = getattr(self, 'up_' + str(i - startp))
-            project = getattr(self, 'proj_' + str(i - startp))
-            layers[i] = upsample(project(layers[i]))
-            node = getattr(self, 'node_' + str(i - startp))
-            layers[i] = node(layers[i] + layers[i - 1])
-
-
-
-class DLAUp(nn.Module):
-    def __init__(self, startp, channels, scales, in_channels=None):
-        super(DLAUp, self).__init__()
-        self.startp = startp
-        if in_channels is None:
-            in_channels = channels
-        self.channels = channels
-        channels = list(channels)
-        scales = np.array(scales, dtype=int)
-        for i in range(len(channels) - 1):
-            j = -i - 2
-            setattr(self, 'ida_{}'.format(i),
-                    IDAUp(channels[j], in_channels[j:],
-                          scales[j:] // scales[j]))
-            scales[j + 1:] = scales[j]
-            in_channels[j + 1:] = [channels[j] for _ in channels[j + 1:]]
-
-    def forward(self, layers):
-        out = [layers[-1]] # start with 32
-        for i in range(len(layers) - self.startp - 1):
-            ida = getattr(self, 'ida_{}'.format(i))
-            ida(layers, len(layers) -i - 2, len(layers))
-            out.insert(0, layers[-1])
-        return out
+#
+# class DLAUp(nn.Module):
+#     def __init__(self, startp, channels, scales, in_channels=None):
+#         super(DLAUp, self).__init__()
+#         self.startp = startp
+#         if in_channels is None:
+#             in_channels = channels
+#         self.channels = channels
+#         channels = list(channels)
+#         scales = np.array(scales, dtype=int)
+#         for i in range(len(channels) - 1):
+#             j = -i - 2
+#             setattr(self, 'ida_{}'.format(i),
+#                     IDAUp(channels[j], in_channels[j:],
+#                           scales[j:] // scales[j]))
+#             scales[j + 1:] = scales[j]
+#             in_channels[j + 1:] = [channels[j] for _ in channels[j + 1:]]
+#
+#     def forward(self, layers):
+#         out = [layers[-1]] # start with 32
+#         for i in range(len(layers) - self.startp - 1):
+#             ida = getattr(self, 'ida_{}'.format(i))
+#             ida(layers, len(layers) -i - 2, len(layers))
+#             out.insert(0, layers[-1])
+#         return out
 
 
 class Interpolate(nn.Module):
@@ -423,71 +423,71 @@ class Interpolate(nn.Module):
         x = F.interpolate(x, scale_factor=self.scale, mode=self.mode, align_corners=False)
         return x
 
-
-class DLASeg(nn.Module):
-    def __init__(self, base_name, heads, pretrained, down_ratio, final_kernel,
-                 last_level, head_conv, out_channel=0):
-        super(DLASeg, self).__init__()
-        assert down_ratio in [2, 4, 8, 16]
-        self.first_level = int(np.log2(down_ratio))
-        self.last_level = last_level
-        self.base = globals()[base_name](pretrained=pretrained)
-        channels = self.base.channels
-        scales = [2 ** i for i in range(len(channels[self.first_level:]))]
-        self.dla_up = DLAUp(self.first_level, channels[self.first_level:], scales)
-
-        if out_channel == 0:
-            out_channel = channels[self.first_level]
-
-        self.ida_up = IDAUp(out_channel, channels[self.first_level:self.last_level], 
-                            [2 ** i for i in range(self.last_level - self.first_level)])
-        
-        self.heads = heads
-        for head in self.heads:
-            classes = self.heads[head]
-            if head_conv > 0:
-              fc = nn.Sequential(
-                  nn.Conv2d(channels[self.first_level], head_conv,
-                    kernel_size=3, padding=1, bias=True),
-                  nn.ReLU(inplace=True),
-                  nn.Conv2d(head_conv, classes, 
-                    kernel_size=final_kernel, stride=1, 
-                    padding=final_kernel // 2, bias=True))
-              if 'hm' in head:
-                fc[-1].bias.data.fill_(-2.19)
-              else:
-                fill_fc_weights(fc)
-            else:
-              fc = nn.Conv2d(channels[self.first_level], classes, 
-                  kernel_size=final_kernel, stride=1, 
-                  padding=final_kernel // 2, bias=True)
-              if 'hm' in head:
-                fc.bias.data.fill_(-2.19)
-              else:
-                fill_fc_weights(fc)
-            self.__setattr__(head, fc)
-
-    def forward(self, x):
-        x = self.base(x)
-        x = self.dla_up(x)
-
-        y = []
-        for i in range(self.last_level - self.first_level):
-            y.append(x[i].clone())
-        self.ida_up(y, 0, len(y))
-
-        z = {}
-        for head in self.heads:
-            z[head] = self.__getattr__(head)(y[-1])
-        return [z]
-    
-
-def get_pose_net(num_layers, heads, head_conv=256, down_ratio=4):
-  model = DLASeg('dla{}'.format(num_layers), heads,
-                 pretrained=True,
-                 down_ratio=down_ratio,
-                 final_kernel=1,
-                 last_level=5,
-                 head_conv=head_conv)
-  return model
-
+#
+# class DLASeg(nn.Module):
+#     def __init__(self, base_name, heads, pretrained, down_ratio, final_kernel,
+#                  last_level, head_conv, out_channel=0):
+#         super(DLASeg, self).__init__()
+#         assert down_ratio in [2, 4, 8, 16]
+#         self.first_level = int(np.log2(down_ratio))
+#         self.last_level = last_level
+#         self.base = globals()[base_name](pretrained=pretrained)
+#         channels = self.base.channels
+#         scales = [2 ** i for i in range(len(channels[self.first_level:]))]
+#         self.dla_up = DLAUp(self.first_level, channels[self.first_level:], scales)
+#
+#         if out_channel == 0:
+#             out_channel = channels[self.first_level]
+#
+#         self.ida_up = IDAUp(out_channel, channels[self.first_level:self.last_level],
+#                             [2 ** i for i in range(self.last_level - self.first_level)])
+#
+#         self.heads = heads
+#         for head in self.heads:
+#             classes = self.heads[head]
+#             if head_conv > 0:
+#               fc = nn.Sequential(
+#                   nn.Conv2d(channels[self.first_level], head_conv,
+#                     kernel_size=3, padding=1, bias=True),
+#                   nn.ReLU(inplace=True),
+#                   nn.Conv2d(head_conv, classes,
+#                     kernel_size=final_kernel, stride=1,
+#                     padding=final_kernel // 2, bias=True))
+#               if 'hm' in head:
+#                 fc[-1].bias.data.fill_(-2.19)
+#               else:
+#                 fill_fc_weights(fc)
+#             else:
+#               fc = nn.Conv2d(channels[self.first_level], classes,
+#                   kernel_size=final_kernel, stride=1,
+#                   padding=final_kernel // 2, bias=True)
+#               if 'hm' in head:
+#                 fc.bias.data.fill_(-2.19)
+#               else:
+#                 fill_fc_weights(fc)
+#             self.__setattr__(head, fc)
+#
+#     def forward(self, x):
+#         x = self.base(x)
+#         x = self.dla_up(x)
+#
+#         y = []
+#         for i in range(self.last_level - self.first_level):
+#             y.append(x[i].clone())
+#         self.ida_up(y, 0, len(y))
+#
+#         z = {}
+#         for head in self.heads:
+#             z[head] = self.__getattr__(head)(y[-1])
+#         return [z]
+#
+#
+# def get_pose_net(num_layers, heads, head_conv=256, down_ratio=4):
+#   model = DLASeg('dla{}'.format(num_layers), heads,
+#                  pretrained=True,
+#                  down_ratio=down_ratio,
+#                  final_kernel=1,
+#                  last_level=5,
+#                  head_conv=head_conv)
+#   return model
+#

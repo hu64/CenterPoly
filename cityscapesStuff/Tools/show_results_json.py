@@ -15,7 +15,7 @@ id_to_file = {}
 for image in anno['images']:
     id_to_file[image['id']] = image['file_name']
 
-results_file = '/usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/hourglass_64pts_pw5_lr1e4_WeSu/results.json'
+results_file = '/usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/hg_64pts_lossNormWithin_WeSu/results.json'
 results = json.load(open(results_file, 'r'))
 image_to_boxes = {}
 for result in results:
@@ -56,7 +56,7 @@ for key in sorted(image_to_boxes):
             poly = patches.Polygon(points, linewidth=lw, edgecolor='y', facecolor='none')
             ax.add_patch(poly)
 
-    # plt.show(block=False)
-    plt.savefig(os.path.join(os.path.dirname(results_file), 'image_examples', os.path.basename(key)))
-    # plt.pause(0.5)
+    plt.show(block=False)
+    # plt.savefig(os.path.join(os.path.dirname(results_file), 'image_examples', os.path.basename(key)))
+    plt.pause(0.5)
     ax.cla()

@@ -205,7 +205,7 @@ class PolydetDataset(data.Dataset):
           xs.append(point_on_border[0])
           poly[k][i*2 + 1] = point_on_border[1] - ct[1]
           ys.append(point_on_border[1])
-        size_norm[k] = PolyArea(xs, ys)
+        size_norm[k] = PolyArea(xs, ys)/1000
 
 
         ind[k] = ct_int[1] * output_w + ct_int[0]
