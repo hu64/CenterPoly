@@ -42,6 +42,7 @@ from copy import deepcopy
 # Cityscapes imports
 from datasets.evaluation.cityscapesscripts.helpers.csHelpers import *
 from datasets.evaluation.cityscapesscripts.evaluation.instances2dict import instances2dict
+from multiprocessing import Pool, Manager
 
 
 ###################################
@@ -248,6 +249,45 @@ def matchGtWithPreds(predictionList,groundTruthList,gtInstances,args):
         print("")
 
     return matches
+
+def match_with_gt_pool(arguments):
+    matches, pred, gt, unfilteredInstances = arguments
+    dictKey = os.path.abspath(gt)
+
+    # Read input files
+    gtImage = readGTImage(gt, args)
+    predInfo = readPredInfo(pred, args)
+
+    # Get and filter ground truth instances
+    curGtInstancesOrig = filterGtInstances(unfilteredInstances, args)
+
+    # Try to assign all predictions
+    (curGtInstances, curPredInstances) = assignGt2Preds(curGtInstancesOrig, gtImage, predInfo, args)
+
+    # append to global dict
+    matches[dictKey] = {"groundTruth": curGtInstances, "prediction": curPredInstances}
+
+    if not args.quiet:
+        print("\rImages Processed: {}".format(len(matches)), end=' ')
+        sys.stdout.flush()
+
+
+# match ground truth instances with predicted instances
+def matchGtWithPredsMultiProcess(predictionList,groundTruthList,gtInstances,args):
+    matches = Manager().dict()
+    if not args.quiet:
+        print("Matching {} pairs of images...".format(len(predictionList)))
+    param_list = []
+    for (pred,gt) in zip(predictionList,groundTruthList):
+        param_list.append((matches, pred, gt, gtInstances[os.path.abspath(gt)]))
+
+    with Pool(processes=8) as pool:
+        pool.map(match_with_gt_pool, param_list)
+    if not args.quiet:
+        print("")
+
+    return dict(matches)
+
 
 # For a given frame, assign all predicted instances to ground truth instances
 def assignGt2Preds(gtInstancesOrig, gtImage, predInfo, args):
@@ -654,7 +694,8 @@ def evaluateImgLists(predictionList, groundTruthList, args):
     # get dictionary of all ground truth instances
     gtInstances = getGtInstances(groundTruthList,args)
     # match predictions and ground truth
-    matches = matchGtWithPreds(predictionList,groundTruthList,gtInstances,args)
+    # matches = matchGtWithPreds(predictionList,groundTruthList,gtInstances,args)
+    matches = matchGtWithPredsMultiProcess(predictionList, groundTruthList, gtInstances, args)
     writeDict2JSON(matches,"matches.json")
     # evaluate matches
     apScores = evaluateMatches(matches, args)

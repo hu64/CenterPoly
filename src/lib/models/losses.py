@@ -90,7 +90,7 @@ def _slow_reg_loss(regr, gt_regr, mask):
     regr    = regr[mask]
     gt_regr = gt_regr[mask]
     
-    regr_loss = nn.functional.smooth_l1_loss(regr, gt_regr, size_average=False)
+    regr_loss = nn.functional.smooth_l1_loss(regr, gt_regr,  reduction='sum')
     regr_loss = regr_loss / (num + 1e-4)
     return regr_loss
 
@@ -107,7 +107,7 @@ def _reg_loss(regr, gt_regr, mask):
   regr = regr * mask
   gt_regr = gt_regr * mask
     
-  regr_loss = nn.functional.smooth_l1_loss(regr, gt_regr, size_average=False)
+  regr_loss = nn.functional.smooth_l1_loss(regr, gt_regr,  reduction='sum')
   regr_loss = regr_loss / (num + 1e-4)
   return regr_loss
 
@@ -144,7 +144,7 @@ class RegL1Loss(nn.Module):
     pred = _transpose_and_gather_feat(output, ind)
     mask = mask.unsqueeze(2).expand_as(pred).float()
     # loss = F.l1_loss(pred * mask, target * mask, reduction='elementwise_mean')
-    loss = F.l1_loss(pred * mask, target * mask, size_average=False)
+    loss = F.l1_loss(pred * mask, target * mask,  reduction='sum')
     loss = loss / (mask.sum() + 1e-4)
     return loss
 
@@ -160,10 +160,9 @@ class RegL1PolyLoss(nn.Module):
         # norm_pred /= (torch.max(pred) + 1e-4)
         # norm_target = pred - torch.min(target)
         # norm_target /= (torch.max(target) + 1e-4)
-        # loss = F.l1_loss(pred * mask, target * mask, reduction='sum')
-        loss = nn.KLDivLoss(reduction='sum')(pred * mask, target * mask)
+        loss = F.l1_loss(pred * mask, target * mask, reduction='sum')
         # loss *= torch.max(target)
-        # loss = F.l1_loss(pred * mask, target * mask, size_average=False)
+        # loss = F.l1_loss(pred * mask, target * mask, reduction='sum')
         # loss *= (size_norm.sum())
         loss = loss / (mask.sum() + 1e-4)
         return loss
@@ -179,7 +178,7 @@ class NormRegL1Loss(nn.Module):
     # loss = F.l1_loss(pred * mask, target * mask, reduction='elementwise_mean')
     pred = pred / (target + 1e-4)
     target = target * 0 + 1
-    loss = F.l1_loss(pred * mask, target * mask, size_average=False)
+    loss = F.l1_loss(pred * mask, target * mask, reduction='sum')
     loss = loss / (mask.sum() + 1e-4)
     return loss
 
@@ -191,7 +190,7 @@ class RegWeightedL1Loss(nn.Module):
     pred = _transpose_and_gather_feat(output, ind)
     mask = mask.float()
     # loss = F.l1_loss(pred * mask, target * mask, reduction='elementwise_mean')
-    loss = F.l1_loss(pred * mask, target * mask, size_average=False)
+    loss = F.l1_loss(pred * mask, target * mask,  reduction='sum')
     loss = loss / (mask.sum() + 1e-4)
     return loss
 
