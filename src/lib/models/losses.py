@@ -12,7 +12,8 @@ import torch
 import torch.nn as nn
 from .utils import _transpose_and_gather_feat
 import torch.nn.functional as F
-
+from PIL import Image, ImageDraw
+import numpy as np
 
 def _slow_neg_loss(pred, gt):
   '''focal loss from CornerNet'''
@@ -153,20 +154,45 @@ class RegL1PolyLoss(nn.Module):
     def __init__(self):
         super(RegL1PolyLoss, self).__init__()
 
-    def forward(self, output, mask, ind, target, size_norm):
+    def forward(self, output, mask, ind, target):
         pred = _transpose_and_gather_feat(output, ind)
-        mask = mask.unsqueeze(2).expand_as(pred).float()
+        # mask = mask.unsqueeze(2).expand_as(pred).float()
+        mask = mask.expand_as(pred).float()
         # norm_pred = pred - torch.min(pred)
         # norm_pred /= (torch.max(pred) + 1e-4)
         # norm_target = pred - torch.min(target)
         # norm_target /= (torch.max(target) + 1e-4)
-        loss = F.l1_loss(pred * mask, target * mask, reduction='sum')
+        loss = F.mse_loss(pred * mask, target * mask, reduction='sum')
         # loss *= torch.max(target)
         # loss = F.l1_loss(pred * mask, target * mask, reduction='sum')
         # loss *= (size_norm.sum())
         loss = loss / (mask.sum() + 1e-4)
         return loss
 
+
+class AreaPolyLoss(nn.Module):
+    def __init__(self):
+        super(AreaPolyLoss, self).__init__()
+
+    def forward(self, output, mask, ind, target, centers):
+        pred = _transpose_and_gather_feat(output, ind)
+        mask = mask.unsqueeze(2).expand_as(pred).float()
+        loss = 0
+
+        for batch in range(output.shape[0]):
+            polygon_mask = Image.new('L', (output.shape[-1], output.shape[-2]), 0)
+            poly_points = []
+            for i in range(0, pred[batch].shape[0]):  # nbr objects
+                for j in range(0, pred[batch].shape[1] - 1, 2):  # points
+                    poly_points.append((int(pred[batch][i][j] + centers[batch][i][0]),
+                                        int(pred[batch][i][j+1] + centers[batch][i][1])))
+
+            ImageDraw.Draw(polygon_mask).polygon(poly_points, outline=0, fill=255)
+            polygon_mask = torch.Tensor(np.array(polygon_mask)).cuda()
+            loss += nn.MSELoss()(polygon_mask, target[batch])
+        # loss = F.l1_loss(pred * mask, target * mask, reduction='sum')
+        loss = loss / (mask.sum() + 1e-4)
+        return loss
 
 class NormRegL1Loss(nn.Module):
   def __init__(self):

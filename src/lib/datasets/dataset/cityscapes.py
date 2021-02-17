@@ -25,6 +25,7 @@ def write_mask_image(args):
 class CITYSCAPES(data.Dataset):
     num_classes = 8
     default_resolution = [512, 1024]
+    # default_resolution = [512, 512]
 
     mean = np.array([0.28404999637454165, 0.32266921542410754, 0.2816898182839038], dtype=np.float32).reshape(1, 1, 3)
     std = np.array([0.04230349568017417, 0.04088212241688149, 0.04269893084955519],dtype=np.float32).reshape(1, 1, 3)
@@ -130,7 +131,7 @@ class CITYSCAPES(data.Dataset):
                     count += 1
                     param_list.append((polygon, mask_path))
 
-        with Pool(processes=12) as pool:
+        with Pool(processes=4) as pool:
             pool.map(write_mask_image, param_list)
 
     def __len__(self):

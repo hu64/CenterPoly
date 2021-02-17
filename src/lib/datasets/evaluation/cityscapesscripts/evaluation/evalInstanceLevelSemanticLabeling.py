@@ -281,7 +281,7 @@ def matchGtWithPredsMultiProcess(predictionList,groundTruthList,gtInstances,args
     for (pred,gt) in zip(predictionList,groundTruthList):
         param_list.append((matches, pred, gt, gtInstances[os.path.abspath(gt)]))
 
-    with Pool(processes=8) as pool:
+    with Pool(processes=4) as pool:
         pool.map(match_with_gt_pool, param_list)
     if not args.quiet:
         print("")

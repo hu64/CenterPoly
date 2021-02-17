@@ -40,4 +40,7 @@ cd src
 # python main.py polydet --val_intervals 12 --exp_id hg_64pts_lossNormMulOn1K_WeSu --poly_weight 10 --elliptical_gt --nbr_points 64 --dataset cityscapes --arch hourglass  --batch_size 2 --master_batch 4 --lr 1e-4 --load_model ../models/ctdet_coco_hg.pth
 # python main.py polydet --val_intervals 12 --exp_id hg_64pts_lossNormMulOn1K_WeSu --poly_weight 10 --elliptical_gt --nbr_points 64 --dataset cityscapes --arch hourglass  --batch_size 2 --master_batch 4 --lr 1e-4 --resume
 
-python main.py polydet --val_intervals 1 --exp_id hg_64pts_NormL1_WeSu --poly_weight 5 --elliptical_gt --nbr_points 64 --dataset cityscapes --arch res_18  --batch_size 16 --master_batch 4 --lr 1e-4 --load_model ../exp/cityscapes/polydet/hourglass_64pts_pw5_lr1e4_WeSu/model_best.pth
+# python main.py polydet --val_intervals 1 --exp_id shg_64pts_L1 --poly_weight 1 --elliptical_gt --nbr_points 64 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 1e-4 --load_model ../exp/cityscapes/polydet/hourglass_64pts_pw5_lr1e4_WeSu/model_best.pth
+# python main.py polydet --val_intervals 1 --exp_id shg_64pts_L1 --poly_weight 1 --elliptical_gt --nbr_points 64 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 1e-4 --resume#
+
+python main.py polydet --val_intervals 1 --exp_id cat_spec_poly --poly_weight 0.1 --cat_spec_poly --elliptical_gt --nbr_points 32 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 1e-4 --load_model ../exp/cityscapes/polydet/hourglass_64pts_pw5_lr1e4_WeSu/model_best.pth

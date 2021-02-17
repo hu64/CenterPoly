@@ -495,7 +495,7 @@ def ctdet_decode(heat, wh, reg=None, cat_spec_wh=False, K=100):
 
     return detections
 
-def polydet_decode(heat, polys, reg=None, cat_spec_wh=False, K=100):
+def polydet_decode(heat, polys, reg=None, cat_spec_poly=False, K=100):
     batch, cat, height, width = heat.size()
 
     # heat = torch.sigmoid(heat)
@@ -512,7 +512,12 @@ def polydet_decode(heat, polys, reg=None, cat_spec_wh=False, K=100):
       xs = xs.view(batch, K, 1) + 0.5
       ys = ys.view(batch, K, 1) + 0.5
     polys = _transpose_and_gather_feat(polys, inds)
-    polys = polys.view(batch, K, polys.shape[-1])
+    if cat_spec_poly:
+        polys = polys.view(batch, K, cat, polys.shape[-1])
+        clses_ind = clses.view(batch, K, 1, 1).expand(batch, K, 1, 2).long()
+        polys = polys.gather(polys.shape[-1], clses_ind).view(batch, K, polys.shape[-1])
+    else:
+        polys = polys.view(batch, K, polys.shape[-1])
 
     clses  = clses.view(batch, K, 1).float()
     scores = scores.view(batch, K, 1)

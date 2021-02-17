@@ -16,14 +16,14 @@ import math
 import bresenham
 
 
-def find_first_different_pixel(points, edge_image):
+def find_first_different_pixel(points, instance_image):
   points = list(points)
   coord = points[0]
-  center_value = edge_image[coord[1], coord[0]]
+  center_value = instance_image[coord[1], coord[0]]
 
   for i, pixel in enumerate(points):
     coord = pixel
-    if edge_image[pixel[1], pixel[0]] != center_value:
+    if instance_image[pixel[1], pixel[0]] != center_value:
       break
   return coord
 
@@ -62,9 +62,9 @@ class PolydetDataset(data.Dataset):
     file_name = self.coco.loadImgs(ids=[img_id])[0]['file_name']
     img_path = os.path.join(self.img_dir, file_name)
     if 'Detrac' in img_path:
-      edge_path = img_path.replace('images', 'mask')
+      instance_path = img_path.replace('images', 'mask')
     elif 'cityscapes' in img_path:
-      edge_path = img_path.replace('leftImg8bit', 'polygons_maskrcnn')
+      instance_path = img_path.replace('leftImg8bit', 'polygons').replace('_polygons', '')
 
     DRAW = False
     ann_ids = self.coco.getAnnIds(imgIds=[img_id])
@@ -74,7 +74,7 @@ class PolydetDataset(data.Dataset):
     num_points = self.opt.nbr_points
     img = cv2.imread(img_path)
     height, width = img.shape[0], img.shape[1]
-    edge_img = cv2.resize(cv2.imread(edge_path, 0), (width, height))
+    instance_img = cv2.resize(cv2.imread(instance_path, 0), (width, height))
 
     c = np.array([img.shape[1] / 2., img.shape[0] / 2.], dtype=np.float32)
     if self.opt.keep_res:
@@ -104,7 +104,7 @@ class PolydetDataset(data.Dataset):
         flipped = True
 
         img = img[:, ::-1, :]
-        edge_img = edge_img[:, ::-1]
+        instance_img = instance_img[:, ::-1]
         c[0] =  width - c[0] - 1
 
     trans_input = get_affine_transform(
@@ -112,7 +112,7 @@ class PolydetDataset(data.Dataset):
     inp = cv2.warpAffine(img, trans_input,
                          (input_w, input_h),
                          flags=cv2.INTER_LINEAR)
-    edge_img = cv2.warpAffine(edge_img, trans_input,
+    instance_img = cv2.warpAffine(instance_img, trans_input,
                          (input_w, input_h),
                          flags=cv2.INTER_LINEAR)
 
@@ -129,15 +129,17 @@ class PolydetDataset(data.Dataset):
 
     output_h = input_h // self.opt.down_ratio
     output_w = input_w // self.opt.down_ratio
-    edge_img = cv2.resize(edge_img, (output_w, output_h))
+    instance_img = cv2.resize(instance_img, (output_w, output_h))
     num_classes = self.num_classes
     trans_output = get_affine_transform(c, s, 0, [output_w, output_h])
 
     hm = np.zeros((num_classes, output_h, output_w), dtype=np.float32)
     wh = np.zeros((self.max_objs, 2), dtype=np.float32)
     poly = np.zeros((self.max_objs, num_points*2), dtype=np.float32)
+    cat_spec_poly = np.zeros((self.max_objs, num_classes * num_points*2), dtype=np.float32)
+    cat_spec_mask_poly = np.zeros((self.max_objs, num_classes * num_points*2), dtype=np.uint8)
     reg = np.zeros((self.max_objs, 2), dtype=np.float32)
-    size_norm = np.zeros((self.max_objs, 1), dtype=np.float32)
+    centers = np.zeros((self.max_objs, 2), dtype=np.float32)
     ind = np.zeros((self.max_objs), dtype=np.int64)
     reg_mask = np.zeros((self.max_objs), dtype=np.uint8)
     cat_spec_wh = np.zeros((self.max_objs, num_classes * 2), dtype=np.float32)
@@ -173,7 +175,7 @@ class PolydetDataset(data.Dataset):
         points_on_border = []
         for point_on_box in points_on_box:
           line = bresenham.bresenham(int(ct[0]), int(ct[1]), int(point_on_box[0]), int(point_on_box[1]))
-          points_on_border.append(find_first_different_pixel(line, edge_img))
+          points_on_border.append(find_first_different_pixel(line, instance_img))
         mass_cx, mass_cy = 0, 0
         for point_on_border in points_on_border:
           mass_cx += point_on_border[0]
@@ -204,8 +206,11 @@ class PolydetDataset(data.Dataset):
           poly[k][i*2] = point_on_border[0] - ct[0]
           xs.append(point_on_border[0])
           poly[k][i*2 + 1] = point_on_border[1] - ct[1]
+          cat_spec_poly[k][cls_id * (i*2)] = point_on_border[0] - ct[0]
+          cat_spec_poly[k][cls_id * (i*2 + 1)] = point_on_border[1] - ct[1]
+          cat_spec_mask_poly[k][cls_id * (i*2): cls_id * (i*2) + 2] = 1
           ys.append(point_on_border[1])
-        size_norm[k] = PolyArea(xs, ys)/1000
+        centers[k] = ct[0], ct[1]
 
 
         ind[k] = ct_int[1] * output_w + ct_int[0]
@@ -217,10 +222,13 @@ class PolydetDataset(data.Dataset):
 
 
     if DRAW:
-      cv2.imwrite(os.path.join('/store/datasets/cityscapes/test_images/polygons/', img_path.replace('/', '_').replace('.jpg', '_edge.jpg')), cv2.resize(edge_img, (input_w, input_h)))
+      cv2.imwrite(os.path.join('/store/datasets/cityscapes/test_images/polygons/', img_path.replace('/', '_').replace('.jpg', '_instance.jpg')), cv2.resize(instance_img, (input_w, input_h)))
       cv2.imwrite(os.path.join('/store/datasets/cityscapes/test_images/polygons/', img_path.replace('/', '_')), cv2.resize(old_inp,  (input_w, input_h)))
 
-    ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'poly': poly, 'size_norm': size_norm}
+    if self.opt.cat_spec_poly:
+      ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'poly': poly, 'cat_spec_poly': cat_spec_poly, 'cat_spec_mask': cat_spec_mask_poly}
+    else:
+      ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'poly': poly}
 
     if self.opt.reg_offset:
       ret.update({'reg': reg})

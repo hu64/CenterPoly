@@ -194,6 +194,8 @@ class opts(object):
                                   'just apply regression on center point.')
     self.parser.add_argument('--cat_spec_wh', action='store_true',
                              help='category specific bounding box size.')
+    self.parser.add_argument('--cat_spec_poly', action='store_true',
+                             help='category specific polygon points.')
     self.parser.add_argument('--not_reg_offset', action='store_true',
                              help='not regress local offset.')
     # exdet
@@ -349,8 +351,7 @@ class opts(object):
                    'seg': 1}
     elif opt.task == 'polydet':
       opt.heads = {'hm': opt.num_classes,
-                   'wh': 2 if not opt.cat_spec_wh else 2 * opt.num_classes,
-                   'poly': opt.nbr_points*2}
+                   'poly': opt.nbr_points*2 if not opt.cat_spec_poly else opt.nbr_points*2 * opt.num_classes}
       if opt.reg_offset:
         opt.heads.update({'reg': 2})
     elif opt.task == 'ctdetVid':
@@ -388,8 +389,8 @@ class opts(object):
                    'dataset': 'uadetrac1on10'},
         'polydet': {'default_resolution': [512, 1024], 'num_classes': 8,
                           'mean': [0.284, 0.323, 0.282], 'std': [0.04, 0.04, 0.04],
-                          'dataset': 'uadetrac1on10_b'},
-        'ctdetMultiSpot': {'default_resolution': [512, 512], 'num_classes': 1,
+                          'dataset': 'cityscapes'},
+        'ctdetMultiSpot': {'default_resolution': [1024, 2048], 'num_classes': 1,
                             'mean': [0.408, 0.447, 0.470], 'std': [0.289, 0.274, 0.278],
                             'dataset': 'uadetrac1on10_b'},
         'exdet': {'default_resolution': [512, 512], 'num_classes': 4,

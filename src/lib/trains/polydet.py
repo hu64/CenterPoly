@@ -6,7 +6,7 @@ import torch
 import numpy as np
 
 from models.losses import FocalLoss
-from models.losses import RegL1Loss, RegLoss, RegL1PolyLoss, NormRegL1Loss, RegWeightedL1Loss
+from models.losses import RegL1Loss, RegLoss, RegL1PolyLoss, AreaPolyLoss, NormRegL1Loss, RegWeightedL1Loss
 from models.decode import polydet_decode
 from models.utils import _sigmoid
 from utils.debugger import Debugger
@@ -21,7 +21,8 @@ class PolydetLoss(torch.nn.Module):
         self.crit = torch.nn.MSELoss() if opt.mse_loss else FocalLoss()
         self.crit_reg = RegL1Loss() if opt.reg_loss == 'l1' else \
             RegLoss() if opt.reg_loss == 'sl1' else None
-        self.crit_poly = NormRegL1Loss()
+        self.crit_poly = RegL1PolyLoss()
+        self.area_poly = AreaPolyLoss()
         self.opt = opt
 
     def forward(self, outputs, batch):
@@ -40,16 +41,23 @@ class PolydetLoss(torch.nn.Module):
                     output['reg'].shape[3], output['reg'].shape[2])).to(opt.device)
 
             hm_loss += self.crit(output['hm'], batch['hm']) / opt.num_stacks
-            poly_loss += self.crit_poly(
-                output['poly'], batch['reg_mask'],
-                batch['ind'], batch['poly']) / opt.num_stacks
+            # area_loss += self.area_poly(output['poly'], batch['reg_mask'], batch['ind'], batch['instance'], batch['centers']) / opt.num_stacks
+            # print(output['poly'].shape)
+            if opt.cat_spec_poly:
+                poly_loss += self.crit_poly(
+                    output['poly'], batch['cat_spec_mask'],
+                    batch['ind'], batch['cat_spec_poly']) / opt.num_stacks
+            else:
+                poly_loss += self.crit_poly(
+                    output['poly'], batch['reg_mask'],
+                    batch['ind'], batch['poly']) / opt.num_stacks
 
             if opt.reg_offset and opt.off_weight > 0:
                 off_loss += self.crit_reg(output['reg'], batch['reg_mask'],
                                           batch['ind'], batch['reg']) / opt.num_stacks
 
         loss = opt.hm_weight * hm_loss + opt.off_weight * off_loss + opt.poly_weight * poly_loss
-        loss_stats = {'loss': loss, 'hm_loss': hm_loss, 'off_loss': off_loss, 'poly_loss': poly_loss}  # hughes
+        loss_stats = {'loss': loss, 'hm_loss': hm_loss, 'off_loss': off_loss, 'poly_loss': poly_loss}
         return loss, loss_stats
 
 
@@ -67,7 +75,7 @@ class PolydetTrainer(BaseTrainer):
         reg = output['reg'] if opt.reg_offset else None
         dets = polydet_decode(
             output['hm'], output['wh'], reg=reg,
-            cat_spec_wh=opt.cat_spec_wh, K=opt.K)
+            cat_spec_poly=opt.cat_spec_poly, K=opt.K)
         dets = dets.detach().cpu().numpy().reshape(1, -1, dets.shape[2])
         dets[:, :, :4] *= opt.down_ratio
         dets_gt = batch['meta']['gt_det'].numpy().reshape(1, -1, dets.shape[2])
@@ -103,7 +111,7 @@ class PolydetTrainer(BaseTrainer):
         reg = output['reg'] if self.opt.reg_offset else None
         dets = polydet_decode(
             output['hm'], output['poly'], reg=reg,
-            cat_spec_wh=self.opt.cat_spec_wh, K=self.opt.K)
+            cat_spec_poly=self.opt.cat_spec_poly, K=self.opt.K)
         dets = dets.detach().cpu().numpy().reshape(1, -1, dets.shape[2])
         dets_out = polydet_post_process(
             dets.copy(), batch['meta']['c'].cpu().numpy(),
