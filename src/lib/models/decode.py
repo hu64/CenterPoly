@@ -513,9 +513,10 @@ def polydet_decode(heat, polys, reg=None, cat_spec_poly=False, K=100):
       ys = ys.view(batch, K, 1) + 0.5
     polys = _transpose_and_gather_feat(polys, inds)
     if cat_spec_poly:
-        polys = polys.view(batch, K, cat, polys.shape[-1])
-        clses_ind = clses.view(batch, K, 1, 1).expand(batch, K, 1, 2).long()
-        polys = polys.gather(polys.shape[-1], clses_ind).view(batch, K, polys.shape[-1])
+        nbr_points = int(polys.shape[-1]/cat)
+        polys = polys.view(batch, K, cat, nbr_points)
+        clses_ind = clses.view(batch, K, 1, 1).expand(batch, K, 1, nbr_points).long()
+        polys = polys.gather(2, clses_ind).view(batch, K, nbr_points)
     else:
         polys = polys.view(batch, K, polys.shape[-1])
 

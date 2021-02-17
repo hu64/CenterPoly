@@ -206,9 +206,9 @@ class PolydetDataset(data.Dataset):
           poly[k][i*2] = point_on_border[0] - ct[0]
           xs.append(point_on_border[0])
           poly[k][i*2 + 1] = point_on_border[1] - ct[1]
-          cat_spec_poly[k][cls_id * (i*2)] = point_on_border[0] - ct[0]
-          cat_spec_poly[k][cls_id * (i*2 + 1)] = point_on_border[1] - ct[1]
-          cat_spec_mask_poly[k][cls_id * (i*2): cls_id * (i*2) + 2] = 1
+          cat_spec_poly[k][(cls_id * (num_points*2)) + (i*2)] = point_on_border[0] - ct[0]
+          cat_spec_poly[k][(cls_id * (num_points*2)) + (i*2 + 1)] = point_on_border[1] - ct[1]
+          cat_spec_mask_poly[k][(cls_id * (num_points*2)) + (i*2): (cls_id * (num_points*2)) + (i*2 + 2)] = 1
           ys.append(point_on_border[1])
         centers[k] = ct[0], ct[1]
 
