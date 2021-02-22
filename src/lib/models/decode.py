@@ -524,12 +524,16 @@ def polydet_decode(heat, polys, reg=None, cat_spec_poly=False, K=100):
     scores = scores.view(batch, K, 1)
 
     poly_points = []
-    for i in range(0, polys.shape[-1], 2):
-        poly_points.append(xs + polys[..., i:i+1])
-        poly_points.append(ys + polys[..., i+1:i+2])
-    polys_points = torch.cat(poly_points, dim=2)
 
-    detections = torch.cat([scores, clses, polys_points], dim=2)
+    polys[..., 0::2] += xs
+    polys[..., 1::2] += ys
+    # for i in range(0, polys.shape[-1], 2):
+    #     poly_points.append(xs + polys[..., i:i+1])
+    #     poly_points.append(ys + polys[..., i+1:i+2])
+    # polys_points = torch.cat(poly_points, dim=2)
+    # polys_points = torch.cat(polys, dim=2)
+
+    detections = torch.cat([scores, clses, polys], dim=2)
 
     return detections
 

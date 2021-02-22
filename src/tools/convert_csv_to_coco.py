@@ -7,60 +7,34 @@ import json
 import numpy as np
 import cv2
 
-io_dic = { '../../cityscapesStuff/BBoxes/train.json':
-            open('../../cityscapesStuff/BBoxes/train.csv', 'r').readlines(),
-           '../../cityscapesStuff/BBoxes/val.json':
-               open('../../cityscapesStuff/BBoxes/val.csv', 'r').readlines(),
-           '../../cityscapesStuff/BBoxes/test.json':
-               open('../../cityscapesStuff/BBoxes/test.csv', 'r').readlines(),
-         }
-"""
-io_dic = {
-            '/store/datasets/ILSVRC2015/train.json':
-                open('/store/datasets/ILSVRC2015/train_1_in_10.csv', 'r').readlines(),
-            '/store/datasets/ILSVRC2015/val.json':
-                open('/store/datasets/ILSVRC2015/minival_1_in_10.csv', 'r').readlines(),
-            '/store/datasets/ILSVRC2015/test.json':
-                open('/store/datasets/ILSVRC2015/val.csv', 'r').readlines(),
-         }
-
-io_dic = {
-            '/store/datasets/UAV/train.json':
-                open('/store/datasets/UAV/train.csv', 'r').readlines(),
-            '/store/datasets/UAV/train-1-on-10.json':
-                open('/store/datasets/UAV/train-1-on-10.csv', 'r').readlines(),
-            '/store/datasets/UAV/val.json':
-                open('/store/datasets/UAV/val.csv', 'r').readlines(),
-            '/store/datasets/UAV/val-1-on-30.json':
-                open('/store/datasets/UAV/val-1-on-30.csv', 'r').readlines(),
-            '/store/datasets/UAV/val-sub.json':
-                open('/store/datasets/UAV/val-sub.csv', 'r').readlines(),
+# io_dic = { '../../cityscapesStuff/BBoxes/train.json':
+#             open('../../cityscapesStuff/BBoxes/train.csv', 'r').readlines(),
+#            '../../cityscapesStuff/BBoxes/val.json':
+#                open('../../cityscapesStuff/BBoxes/val.csv', 'r').readlines(),
+#            '../../cityscapesStuff/BBoxes/test.json':
+#                open('../../cityscapesStuff/BBoxes/test.csv', 'r').readlines(),
+#          }
+# io_dic = { '../../cityscapesStuff/BBoxes/train16.json':
+#             open('../../cityscapesStuff/BBoxes/train16pts.csv', 'r').readlines(),
+#            '../../cityscapesStuff/BBoxes/val16.json':
+#                open('../../cityscapesStuff/BBoxes/val16pts.csv', 'r').readlines(),
+#          }
+# io_dic = { '../../cityscapesStuff/BBoxes/train32.json':
+#             open('../../cityscapesStuff/BBoxes/train32pts.csv', 'r').readlines(),
+#            '../../cityscapesStuff/BBoxes/val32.json':
+#                open('../../cityscapesStuff/BBoxes/val32pts.csv', 'r').readlines(),
+#          }
+# io_dic = { '../../cityscapesStuff/BBoxes/train64.json':
+#             open('../../cityscapesStuff/BBoxes/train64pts.csv', 'r').readlines(),
+#            '../../cityscapesStuff/BBoxes/val64.json':
+#                open('../../cityscapesStuff/BBoxes/val64pts.csv', 'r').readlines(),
+#          }
+io_dic = { '../../cityscapesStuff/BBoxes/train64_NoOverlap.json':
+            open('../../cityscapesStuff/BBoxes/train32pts_NoOverlap.csv', 'r').readlines(),
+           '../../cityscapesStuff/BBoxes/val64_NoOverlap.json':
+               open('../../cityscapesStuff/BBoxes/val32pts_NoOverlap.csv', 'r').readlines(),
          }
 
-io_dic = {  '/store/datasets/UA-Detrac/COCO-format/train_b.json':
-                open('/store/datasets/UA-Detrac/train-tf-all.csv', 'r').readlines(),
-            '/store/datasets/UA-Detrac/COCO-format/val_b.json':
-                open('/store/datasets/UA-Detrac/val-tf-all.csv', 'r').readlines(),
-            '/store/datasets/UA-Detrac/COCO-format/test_b.json':
-                open('/store/datasets/UA-Detrac/test-tf-all.csv', 'r').readlines(),
-            '/store/datasets/UA-Detrac/COCO-format/test-1-on-30_b.json':
-                open('/store/datasets/UA-Detrac/test-tf-1-on-30.csv', 'r').readlines(),
-            '/store/datasets/UA-Detrac/COCO-format/train-1-on-10_b.json':
-                open('/store/datasets/UA-Detrac/train-tf.csv', 'r').readlines(),
-            }
-
-io_dic = {  '/store/datasets/UA-Detrac/COCO-format/train.json':
-                open('/store/datasets/UA-Detrac/train-tf-all.csv', 'r').readlines(),
-            '/store/datasets/UA-Detrac/COCO-format/val.json':
-                open('/store/datasets/UA-Detrac/val-tf-all.csv', 'r').readlines(),
-            '/store/datasets/UA-Detrac/COCO-format/test.json':
-                open('/store/datasets/UA-Detrac/test-tf-all.csv', 'r').readlines(),
-            '/store/datasets/UA-Detrac/COCO-format/test-1-on-30.json':
-                open('/store/datasets/UA-Detrac/test-tf-1-on-30.csv', 'r').readlines(),
-            '/store/datasets/UA-Detrac/COCO-format/train-1-on-10.json':
-                open('/store/datasets/UA-Detrac/train-tf.csv', 'r').readlines(),
-            }
-"""
 
 DEBUG = False
 import os
@@ -114,9 +88,9 @@ for outputfile in io_dic:
                 continue
         BINARY = '_b' in outputfile
         if items[0] in image_to_boxes:
-            image_to_boxes[items[0]].append(items[1:7])
+            image_to_boxes[items[0]].append(items[1:])
         else:
-            image_to_boxes[items[0]] = [items[1:7]]
+            image_to_boxes[items[0]] = [items[1:]]
     ret = {'images': [], 'annotations': [], "categories": cat_info}
     for count, path in enumerate(sorted(image_to_boxes)):
 
@@ -128,6 +102,7 @@ for outputfile in io_dic:
         for ann_ind, box in enumerate(image_to_boxes[path]):
 
             x0, y0, x1, y1, label = int(box[0]), int(box[1]), int(box[2]), int(box[3]), box[4]
+            poly_points = [float(item) for item in box[5:]]
             if label.strip() == 'no_object':
                 continue
 
@@ -146,7 +121,8 @@ for outputfile in io_dic:
                    'truncated': truncated,
                    'occluded': occluded,
                    'iscrowd': 0,
-                   'area': (bbox[3]-bbox[1])*(bbox[2]-bbox[0])}
+                   'area': (bbox[3]-bbox[1])*(bbox[2]-bbox[0]),
+                   'poly': poly_points}
             ret['annotations'].append(ann)
 
     print("File: ", outputfile)

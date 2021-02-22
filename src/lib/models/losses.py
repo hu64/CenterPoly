@@ -156,13 +156,13 @@ class RegL1PolyLoss(nn.Module):
 
     def forward(self, output, mask, ind, target):
         pred = _transpose_and_gather_feat(output, ind)
-        # mask = mask.unsqueeze(2).expand_as(pred).float()
-        mask = mask.expand_as(pred).float()
+        mask = mask.unsqueeze(2).expand_as(pred).float()
+        # mask = mask.expand_as(pred).float()
         # norm_pred = pred - torch.min(pred)
         # norm_pred /= (torch.max(pred) + 1e-4)
         # norm_target = pred - torch.min(target)
         # norm_target /= (torch.max(target) + 1e-4)
-        loss = F.mse_loss(pred * mask, target * mask, reduction='sum')
+        loss = F.l1_loss(pred * mask, target * mask, reduction='sum')
         # loss *= torch.max(target)
         # loss = F.l1_loss(pred * mask, target * mask, reduction='sum')
         # loss *= (size_norm.sum())

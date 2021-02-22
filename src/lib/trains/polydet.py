@@ -39,6 +39,12 @@ class PolydetLoss(torch.nn.Module):
                     batch['reg'].detach().cpu().numpy(),
                     batch['ind'].detach().cpu().numpy(),
                     output['reg'].shape[3], output['reg'].shape[2])).to(opt.device)
+            if opt.eval_oracle_poly:
+                # output['poly'] = batch['poly']
+                output['poly'] = torch.from_numpy(gen_oracle_map(
+                    batch['poly'].detach().cpu().numpy(),
+                    batch['ind'].detach().cpu().numpy(),
+                    output['poly'].shape[3], output['poly'].shape[2])).to(opt.device)
 
             hm_loss += self.crit(output['hm'], batch['hm']) / opt.num_stacks
             # area_loss += self.area_poly(output['poly'], batch['reg_mask'], batch['ind'], batch['instance'], batch['centers']) / opt.num_stacks

@@ -7,7 +7,7 @@ import numpy as np
 import os
 
 
-results = open('/store/datasets/cityscapes/train.csv', 'r').readlines()
+results = open('../BBoxes/train32pts_NoOverlap.csv', 'r').readlines()
 
 
 image_to_boxes = {}
@@ -38,5 +38,5 @@ for key in image_to_boxes:
         ax.add_patch(rect)
 
     plt.show(block=False)
-    plt.pause(0.001)
+    plt.pause(0.5)
     ax.cla()

@@ -14,16 +14,20 @@ from utils.image import gaussian_radius, draw_umich_gaussian, draw_msra_gaussian
 from utils.image import draw_dense_reg
 import math
 import bresenham
+from PIL import Image, ImageDraw
 
 
-def find_first_different_pixel(points, instance_image):
+def find_first_non_zero_pixel(points, instance_image):
   points = list(points)
   coord = points[0]
-  center_value = instance_image[coord[1], coord[0]]
 
-  for i, pixel in enumerate(points):
+  for pixel in points:
+    pixel = list(pixel)
+    pixel[0] = np.clip(pixel[0], 0, instance_image.shape[1]-1)
+    pixel[1] = np.clip(pixel[1], 0, instance_image.shape[0]-1)
     coord = pixel
-    if instance_image[pixel[1], pixel[0]] != center_value:
+
+    if instance_image[pixel[1], pixel[0]] > 0:
       break
   return coord
 
@@ -153,9 +157,29 @@ class PolydetDataset(data.Dataset):
     for k in range(num_objs):
       ann = anns[k]
       bbox = self._coco_box_to_bbox(ann['bbox'])
+      ct = np.array(
+        [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2], dtype=np.float32)
+
+      points_on_border = ann['poly']
+      # poly_img = Image.new('L', (width, height), 0)
+      # ImageDraw.Draw(poly_img).polygon(poly_gt, outline=0, fill=255)
+      # poly_img = np.array(poly_img)
+      # points_on_box = find_points_from_box(box=bbox, n_points=num_points)
+      # points_on_border = []
+      # for point_on_box in points_on_box:
+      #   line = bresenham.bresenham(int(point_on_box[0]), int(point_on_box[1]), int(ct[0]), int(ct[1]))
+      #   points_on_border.append(find_first_non_zero_pixel(line, poly_img))
+      # del(poly_img)
       cls_id = int(self.cat_ids[ann['category_id']])
       if flipped:
         bbox[[0, 2]] = width - bbox[[2, 0]] - 1
+        for i in range(0, len(points_on_border), 2):
+          points_on_border[i] = width - points_on_border[i] - 1
+      for i in range(0, len(points_on_border), 2):
+        points_on_border[i], points_on_border[i+1] = affine_transform([points_on_border[i], points_on_border[i+1]], trans_output)
+        points_on_border[i] = np.clip(points_on_border[i], 0, output_w - 1)
+        points_on_border[i+1] = np.clip(points_on_border[i+1], 0, output_h - 1)
+
       bbox[:2] = affine_transform(bbox[:2], trans_output)
       bbox[2:] = affine_transform(bbox[2:], trans_output)
       bbox[[0, 2]] = np.clip(bbox[[0, 2]], 0, output_w - 1)
@@ -170,18 +194,12 @@ class PolydetDataset(data.Dataset):
           [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2], dtype=np.float32)
 
         wh[k] = 1. * w, 1. * h
-
-        points_on_box = find_points_from_box(box=bbox, n_points=num_points)
-        points_on_border = []
-        for point_on_box in points_on_box:
-          line = bresenham.bresenham(int(ct[0]), int(ct[1]), int(point_on_box[0]), int(point_on_box[1]))
-          points_on_border.append(find_first_different_pixel(line, instance_img))
         mass_cx, mass_cy = 0, 0
-        for point_on_border in points_on_border:
-          mass_cx += point_on_border[0]
-          mass_cy += point_on_border[1]
-        ct[0] = mass_cx/len(points_on_border)
-        ct[1] = mass_cy / len(points_on_border)
+        for i in range(0, len(points_on_border), 2):
+          mass_cx += points_on_border[i]
+          mass_cy += points_on_border[i+1]
+        ct[0] = mass_cx / (len(points_on_border)/2)
+        ct[1] = mass_cy / (len(points_on_border)/2)
         ct_int = ct.astype(int)
 
         if DRAW:
@@ -198,18 +216,14 @@ class PolydetDataset(data.Dataset):
         else:
           draw_gaussian(hm[cls_id], ct_int, radius)
 
-        def PolyArea(x, y):
-          return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
-        xs = []
-        ys = []
-        for i, point_on_border in enumerate(points_on_border):
-          poly[k][i*2] = point_on_border[0] - ct[0]
-          xs.append(point_on_border[0])
-          poly[k][i*2 + 1] = point_on_border[1] - ct[1]
-          cat_spec_poly[k][(cls_id * (num_points*2)) + (i*2)] = point_on_border[0] - ct[0]
-          cat_spec_poly[k][(cls_id * (num_points*2)) + (i*2 + 1)] = point_on_border[1] - ct[1]
+        # points_on_border = np.array(points_on_border).astype(np.float32)
+        # print(points_on_border)
+        for i in range(0, len(points_on_border), 2):
+          poly[k][i] = points_on_border[i] - ct[0]
+          poly[k][i+1] = points_on_border[i+1] - ct[1]
+          cat_spec_poly[k][(cls_id * (num_points*2)) + i] = points_on_border[1] - ct[0]
+          cat_spec_poly[k][(cls_id * (num_points*2)) + (i+1)] = points_on_border[i+1] - ct[1]
           cat_spec_mask_poly[k][(cls_id * (num_points*2)) + (i*2): (cls_id * (num_points*2)) + (i*2 + 2)] = 1
-          ys.append(point_on_border[1])
         centers[k] = ct[0], ct[1]
 
 
@@ -218,8 +232,6 @@ class PolydetDataset(data.Dataset):
         reg_mask[k] = 1
         cat_spec_wh[k, cls_id * 2: cls_id * 2 + 2] = wh[k]
         cat_spec_mask[k, cls_id * 2: cls_id * 2 + 2] = 1
-
-
 
     if DRAW:
       cv2.imwrite(os.path.join('/store/datasets/cityscapes/test_images/polygons/', img_path.replace('/', '_').replace('.jpg', '_instance.jpg')), cv2.resize(instance_img, (input_w, input_h)))

@@ -4,7 +4,6 @@ from __future__ import print_function
 
 import torch
 
-
 from .networks.msra_resnet import get_pose_net
 from .networks.dlav0 import get_pose_net as get_dlav0
 from .networks.large_hourglass import get_large_hourglass_net, get_small_hourglass_net
@@ -43,6 +42,8 @@ def load_model(model, model_path, optimizer=None, resume=False,
       state_dict[k] = state_dict_[k]
   model_state_dict = model.state_dict()
 
+  loaded_state_dict = state_dict.copy()
+
   # check loaded parameters and created model parameters
   msg = 'If you see this, your model does not fully load the ' + \
         'pre-trained weight. Please make sure ' + \
@@ -77,6 +78,20 @@ def load_model(model, model_path, optimizer=None, resume=False,
       print('Resumed optimizer with start lr', start_lr)
     else:
       print('No optimizer parameters in checkpoint.')
+
+  FREEZE_LAYERS = False
+  if FREEZE_LAYERS:
+    for name, param in model.named_parameters():
+      if name in loaded_state_dict and not 'poly' in name and not 'reg' in name:
+        # if name in loaded_state_dict and not 'Fusion' in name:
+        # if name in loaded_state_dict and not 'reg' in name and not 'seg' in name and ('kps' in name or 'pre' in name):
+        # print('Freeze: ', name)
+        param.requires_grad = False
+        param.freeze = True
+      else:
+        print('Not freezing: ', name)
+        param.freeze = False
+
   if optimizer is not None:
     return model, optimizer, start_epoch
   else:

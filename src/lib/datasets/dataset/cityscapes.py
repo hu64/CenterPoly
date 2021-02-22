@@ -34,15 +34,17 @@ class CITYSCAPES(data.Dataset):
         super(CITYSCAPES, self).__init__()
         self.data_dir = os.path.join(opt.data_dir, 'coco')
         self.img_dir = os.path.join(self.data_dir, '{}2017'.format(split))
+        self.split = split
+        self.opt = opt
 
         base_dir = '../cityscapesStuff/BBoxes'
 
         if split == 'test':
             self.annot_path = os.path.join(base_dir, 'test.json')
         elif split == 'val':
-            self.annot_path = os.path.join(base_dir, 'val.json')
+            self.annot_path = os.path.join(base_dir, 'val' + str(self.opt.nbr_points) + '.json')
         else:
-            self.annot_path = os.path.join(base_dir, 'train.json')
+            self.annot_path = os.path.join(base_dir, 'train' + str(self.opt.nbr_points) + '.json')
 
         self.max_objs = 128
         self.class_name = [
@@ -63,8 +65,7 @@ class CITYSCAPES(data.Dataset):
         # self.mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
         # self.std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
 
-        self.split = split
-        self.opt = opt
+
 
         print('==> initializing UA-Detrac {} data.'.format(split))
         self.coco = coco.COCO(self.annot_path)
@@ -117,19 +118,20 @@ class CITYSCAPES(data.Dataset):
             count = 0
             for cls_ind in all_bboxes[image_id]:
                 for bbox in all_bboxes[image_id][cls_ind]:
-                    score = str(bbox[0])
-                    label = self.class_name[cls_ind]
-                    polygon = list(map(self._to_float, bbox[2:]))
-                    # poly_points = []
-                    # for i in range(0, len(polygon)-1, 2):
-                    #     poly_points.append((int(polygon[i]), int(polygon[i+1])))
-                    # polygon_mask = Image.new('L', (2048, 1024), 0)
-                    # ImageDraw.Draw(polygon_mask).polygon(poly_points, outline=0, fill=255)
-                    mask_path = os.path.join(masks_dir, os.path.basename(image_name).replace('.png', '_' + str(count) + '.png'))
-                    # polygon_mask.save(mask_path)
-                    text_file.write('masks/' + os.path.basename(mask_path) + ' ' + str(self.label_to_id[label]) + ' ' + score + '\n')
-                    count += 1
-                    param_list.append((polygon, mask_path))
+                    if bbox[0] > 0:
+                        score = str(bbox[0])
+                        label = self.class_name[cls_ind]
+                        polygon = list(map(self._to_float, bbox[2:]))
+                        # poly_points = []
+                        # for i in range(0, len(polygon)-1, 2):
+                        #     poly_points.append((int(polygon[i]), int(polygon[i+1])))
+                        # polygon_mask = Image.new('L', (2048, 1024), 0)
+                        # ImageDraw.Draw(polygon_mask).polygon(poly_points, outline=0, fill=255)
+                        mask_path = os.path.join(masks_dir, os.path.basename(image_name).replace('.png', '_' + str(count) + '.png'))
+                        # polygon_mask.save(mask_path)
+                        text_file.write('masks/' + os.path.basename(mask_path) + ' ' + str(self.label_to_id[label]) + ' ' + score + '\n')
+                        count += 1
+                        param_list.append((polygon, mask_path))
 
         with Pool(processes=4) as pool:
             pool.map(write_mask_image, param_list)
@@ -162,6 +164,6 @@ class CITYSCAPES(data.Dataset):
         return AP
 
 # os.environ['CITYSCAPES_DATASET'] = '/store/datasets/cityscapes'
-# os.environ['CITYSCAPES_RESULTS'] = '/usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/hourglass_64pts_pw5_lr1e4_WeSu/results'
+# os.environ['CITYSCAPES_RESULTS'] = '/usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/oracle_test_new_gt/results'
 # from datasets.evaluation.cityscapesscripts.evaluation import evalInstanceLevelSemanticLabeling
 # AP = evalInstanceLevelSemanticLabeling.getAP()

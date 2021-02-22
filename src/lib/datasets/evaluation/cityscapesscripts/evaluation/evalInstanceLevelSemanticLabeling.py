@@ -283,6 +283,7 @@ def matchGtWithPredsMultiProcess(predictionList,groundTruthList,gtInstances,args
 
     with Pool(processes=4) as pool:
         pool.map(match_with_gt_pool, param_list)
+
     if not args.quiet:
         print("")
 

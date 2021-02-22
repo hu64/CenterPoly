@@ -225,6 +225,8 @@ class opts(object):
                              help='use ground center heatmap.')
     self.parser.add_argument('--eval_oracle_wh', action='store_true',
                              help='use ground truth bounding box size.')
+    self.parser.add_argument('--eval_oracle_poly', action='store_true',
+                             help='use ground truth bounding box size.')
     self.parser.add_argument('--eval_oracle_offset', action='store_true',
                              help='use ground truth local heatmap offset.')
     self.parser.add_argument('--eval_oracle_kps', action='store_true',
