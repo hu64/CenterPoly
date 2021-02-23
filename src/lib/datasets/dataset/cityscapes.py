@@ -6,7 +6,7 @@ import pycocotools.coco as coco
 import numpy as np
 import json
 import os
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageChops
 import torch.utils.data as data
 import glob
 from multiprocessing import Pool
@@ -42,9 +42,10 @@ class CITYSCAPES(data.Dataset):
         if split == 'test':
             self.annot_path = os.path.join(base_dir, 'test.json')
         elif split == 'val':
-            self.annot_path = os.path.join(base_dir, 'val' + str(self.opt.nbr_points) + '.json')
+            self.annot_path = os.path.join(base_dir, 'val' + str(self.opt.nbr_points) + '_real_points.json')
         else:
-            self.annot_path = os.path.join(base_dir, 'train' + str(self.opt.nbr_points) + '.json')
+            # self.annot_path = os.path.join(base_dir, 'train' + str(self.opt.nbr_points) + '.json')
+            self.annot_path = os.path.join(base_dir, 'train' + str(self.opt.nbr_points) + '_real_points.json')
 
         self.max_objs = 128
         self.class_name = [
@@ -67,7 +68,7 @@ class CITYSCAPES(data.Dataset):
 
 
 
-        print('==> initializing UA-Detrac {} data.'.format(split))
+        print('==> initializing cityscapes {} data.'.format(split))
         self.coco = coco.COCO(self.annot_path)
         self.images = self.coco.getImgIds()
         self.num_samples = len(self.images)
@@ -111,15 +112,17 @@ class CITYSCAPES(data.Dataset):
         if not os.path.exists(masks_dir):
             os.mkdir(masks_dir)
 
-        param_list = []
         for image_id in all_bboxes:
             image_name = id_to_file[int(image_id)]
             text_file = open(os.path.join(save_dir, os.path.basename(image_name).replace('.png', '.txt')), 'w')
             count = 0
             for cls_ind in all_bboxes[image_id]:
+                param_list = []
+                to_remove_mask = Image.new('L', (2048, 1024), 1)
                 for bbox in all_bboxes[image_id][cls_ind]:
                     if bbox[0] > 0:
                         score = str(bbox[0])
+                        depth = bbox[-1]
                         label = self.class_name[cls_ind]
                         polygon = list(map(self._to_float, bbox[2:]))
                         # poly_points = []
@@ -131,10 +134,21 @@ class CITYSCAPES(data.Dataset):
                         # polygon_mask.save(mask_path)
                         text_file.write('masks/' + os.path.basename(mask_path) + ' ' + str(self.label_to_id[label]) + ' ' + score + '\n')
                         count += 1
-                        param_list.append((polygon, mask_path))
+                        param_list.append((polygon, mask_path, float(bbox[0]), depth))
 
-        with Pool(processes=4) as pool:
-            pool.map(write_mask_image, param_list)
+                for args in sorted(param_list, key=lambda x: x[-1]):
+                    polygon, mask_path, score, depth = args
+                    poly_points = []
+                    for i in range(0, len(polygon) - 1, 2):
+                        poly_points.append((int(polygon[i]), int(polygon[i + 1])))
+                    polygon_mask = Image.new('L', (2048, 1024), 0)
+                    ImageDraw.Draw(polygon_mask).polygon(poly_points, outline=0, fill=255)
+                    polygon_mask = Image.fromarray(np.array(polygon_mask) * np.array(to_remove_mask))
+                    if score >= 0.25:
+                        ImageDraw.Draw(to_remove_mask).polygon(poly_points, outline=0, fill=0)
+                    polygon_mask.save(mask_path)
+        # with Pool(processes=4) as pool:
+        #     pool.map(write_mask_image, param_list)
 
     def __len__(self):
         return self.num_samples

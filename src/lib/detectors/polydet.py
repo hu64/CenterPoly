@@ -25,18 +25,19 @@ class PolydetDetector(BaseDetector):
       output = self.model(images)[-1]
       hm = output['hm'].sigmoid_()
       polys = output['poly']
+      pseudo_depth = output['depth']
       reg = output['reg'] if self.opt.reg_offset else None
       if self.opt.flip_test:
         hm = (hm[0:1] + flip_tensor(hm[1:2])) / 2
         reg = reg[0:1] if reg is not None else None
       torch.cuda.synchronize()
       forward_time = time.time()
-      dets = polydet_decode(hm, polys, reg=reg, cat_spec_poly=self.opt.cat_spec_poly, K=self.opt.K)
+      dets = polydet_decode(hm, polys, pseudo_depth, reg=reg, cat_spec_poly=self.opt.cat_spec_poly, K=self.opt.K)
 
     if return_time:
       return output, dets, forward_time
     else:
-      return output, dets, polys
+      return output, dets
 
   def post_process(self, dets, meta, scale=1):
     dets = dets.detach().cpu().numpy()

@@ -495,7 +495,7 @@ def ctdet_decode(heat, wh, reg=None, cat_spec_wh=False, K=100):
 
     return detections
 
-def polydet_decode(heat, polys, reg=None, cat_spec_poly=False, K=100):
+def polydet_decode(heat, polys, depth, reg=None, cat_spec_poly=False, K=100):
     batch, cat, height, width = heat.size()
 
     # heat = torch.sigmoid(heat)
@@ -512,6 +512,7 @@ def polydet_decode(heat, polys, reg=None, cat_spec_poly=False, K=100):
       xs = xs.view(batch, K, 1) + 0.5
       ys = ys.view(batch, K, 1) + 0.5
     polys = _transpose_and_gather_feat(polys, inds)
+    depth = _transpose_and_gather_feat(depth, inds)
     if cat_spec_poly:
         nbr_points = int(polys.shape[-1]/cat)
         polys = polys.view(batch, K, cat, nbr_points)
@@ -520,6 +521,7 @@ def polydet_decode(heat, polys, reg=None, cat_spec_poly=False, K=100):
     else:
         polys = polys.view(batch, K, polys.shape[-1])
 
+    depth = depth.view(batch, K, 1).float()
     clses  = clses.view(batch, K, 1).float()
     scores = scores.view(batch, K, 1)
 
@@ -533,7 +535,7 @@ def polydet_decode(heat, polys, reg=None, cat_spec_poly=False, K=100):
     # polys_points = torch.cat(poly_points, dim=2)
     # polys_points = torch.cat(polys, dim=2)
 
-    detections = torch.cat([scores, clses, polys], dim=2)
+    detections = torch.cat([scores, clses, polys, depth], dim=2)
 
     return detections
 

@@ -24,15 +24,20 @@ import cv2
 #            '../../cityscapesStuff/BBoxes/val32.json':
 #                open('../../cityscapesStuff/BBoxes/val32pts.csv', 'r').readlines(),
 #          }
-# io_dic = { '../../cityscapesStuff/BBoxes/train64.json':
-#             open('../../cityscapesStuff/BBoxes/train64pts.csv', 'r').readlines(),
-#            '../../cityscapesStuff/BBoxes/val64.json':
-#                open('../../cityscapesStuff/BBoxes/val64pts.csv', 'r').readlines(),
+# io_dic = { '../../cityscapesStuff/BBoxes/train64_real_points.json':
+#             open('../../cityscapesStuff/BBoxes/train64_real_points.csv', 'r').readlines(),
+#            '../../cityscapesStuff/BBoxes/val64_real_points.json':
+#                open('../../cityscapesStuff/BBoxes/val64_real_points.csv', 'r').readlines(),
 #          }
-io_dic = { '../../cityscapesStuff/BBoxes/train64_NoOverlap.json':
-            open('../../cityscapesStuff/BBoxes/train32pts_NoOverlap.csv', 'r').readlines(),
-           '../../cityscapesStuff/BBoxes/val64_NoOverlap.json':
-               open('../../cityscapesStuff/BBoxes/val32pts_NoOverlap.csv', 'r').readlines(),
+# io_dic = { '../../cityscapesStuff/BBoxes/train32_real_points.json':
+#             open('../../cityscapesStuff/BBoxes/train32_real_points.csv', 'r').readlines(),
+#            '../../cityscapesStuff/BBoxes/val32_real_points.json':
+#                open('../../cityscapesStuff/BBoxes/val32_real_points.csv', 'r').readlines(),
+#          }
+io_dic = { '../../cityscapesStuff/BBoxes/train16_real_points.json':
+            open('../../cityscapesStuff/BBoxes/train16_real_points.csv', 'r').readlines(),
+           '../../cityscapesStuff/BBoxes/val16_real_points.json':
+               open('../../cityscapesStuff/BBoxes/val16_real_points.csv', 'r').readlines(),
          }
 
 
@@ -100,9 +105,8 @@ for outputfile in io_dic:
         ret['images'].append(image_info)
 
         for ann_ind, box in enumerate(image_to_boxes[path]):
-
-            x0, y0, x1, y1, label = int(box[0]), int(box[1]), int(box[2]), int(box[3]), box[4]
-            poly_points = [float(item) for item in box[5:]]
+            x0, y0, x1, y1, label, pseudo_depth = int(box[0]), int(box[1]), int(box[2]), int(box[3]), box[4], int(box[5])
+            poly_points = [float(item) for item in box[6:]]
             if label.strip() == 'no_object':
                 continue
 
@@ -122,7 +126,8 @@ for outputfile in io_dic:
                    'occluded': occluded,
                    'iscrowd': 0,
                    'area': (bbox[3]-bbox[1])*(bbox[2]-bbox[0]),
-                   'poly': poly_points}
+                   'poly': poly_points,
+                   'pseudo_depth': pseudo_depth}
             ret['annotations'].append(ann)
 
     print("File: ", outputfile)

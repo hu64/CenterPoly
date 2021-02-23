@@ -27,7 +27,7 @@ class PolydetLoss(torch.nn.Module):
 
     def forward(self, outputs, batch):
         opt = self.opt
-        hm_loss, off_loss, poly_loss = 0, 0, 0
+        hm_loss, off_loss, poly_loss, depth_loss = 0, 0, 0, 0
         for s in range(opt.num_stacks):
             output = outputs[s]
             if not opt.mse_loss:
@@ -45,7 +45,14 @@ class PolydetLoss(torch.nn.Module):
                     batch['poly'].detach().cpu().numpy(),
                     batch['ind'].detach().cpu().numpy(),
                     output['poly'].shape[3], output['poly'].shape[2])).to(opt.device)
+            if opt.eval_oracle_pseudo_depth:
+                output['pseudo_depth'] = torch.from_numpy(gen_oracle_map(
+                    batch['pseudo_depth'].detach().cpu().numpy(),
+                    batch['ind'].detach().cpu().numpy(),
+                    output['pseudo_depth'].shape[3], output['pseudo_depth'].shape[2])).to(opt.device)
 
+            depth_loss += self.crit_reg(output['pseudo_depth'], batch['reg_mask'],
+                                          batch['ind'], batch['pseudo_depth']) / opt.num_stacks
             hm_loss += self.crit(output['hm'], batch['hm']) / opt.num_stacks
             # area_loss += self.area_poly(output['poly'], batch['reg_mask'], batch['ind'], batch['instance'], batch['centers']) / opt.num_stacks
             # print(output['poly'].shape)
@@ -62,8 +69,8 @@ class PolydetLoss(torch.nn.Module):
                 off_loss += self.crit_reg(output['reg'], batch['reg_mask'],
                                           batch['ind'], batch['reg']) / opt.num_stacks
 
-        loss = opt.hm_weight * hm_loss + opt.off_weight * off_loss + opt.poly_weight * poly_loss
-        loss_stats = {'loss': loss, 'hm_loss': hm_loss, 'off_loss': off_loss, 'poly_loss': poly_loss}
+        loss = opt.hm_weight * hm_loss + opt.off_weight * off_loss + opt.poly_weight * poly_loss + opt.depth_weight * depth_loss
+        loss_stats = {'loss': loss, 'hm_loss': hm_loss, 'off_loss': off_loss, 'poly_loss': poly_loss, 'depth_loss': depth_loss}
         return loss, loss_stats
 
 
@@ -72,7 +79,7 @@ class PolydetTrainer(BaseTrainer):
         super(PolydetTrainer, self).__init__(opt, model, optimizer=optimizer)
 
     def _get_losses(self, opt):
-        loss_states = ['loss', 'hm_loss', 'off_loss', 'poly_loss']
+        loss_states = ['loss', 'hm_loss', 'off_loss', 'poly_loss', 'depth_loss']
         loss = PolydetLoss(opt)
         return loss_states, loss
 
@@ -116,7 +123,7 @@ class PolydetTrainer(BaseTrainer):
     def save_result(self, output, batch, results):
         reg = output['reg'] if self.opt.reg_offset else None
         dets = polydet_decode(
-            output['hm'], output['poly'], reg=reg,
+            output['hm'], output['poly'], output['pseudo_depth'], reg=reg,
             cat_spec_poly=self.opt.cat_spec_poly, K=self.opt.K)
         dets = dets.detach().cpu().numpy().reshape(1, -1, dets.shape[2])
         dets_out = polydet_post_process(

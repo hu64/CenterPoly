@@ -169,6 +169,8 @@ class opts(object):
                              help='loss weight for bounding box size.')
     self.parser.add_argument('--poly_weight', type=float, default=0.1,
                              help='loss weight for polygons points.')
+    self.parser.add_argument('--depth_weight', type=float, default=0.1,
+                             help='loss weight for pseudo depth.')
     self.parser.add_argument('--nbr_points', type=int, default=16,
                              help='number of points for polygons')
     # multi_pose
@@ -235,6 +237,8 @@ class opts(object):
                              help='use ground truth human joint heatmaps.')
     self.parser.add_argument('--eval_oracle_hp_offset', action='store_true',
                              help='use ground truth human joint local offset.')
+    self.parser.add_argument('--eval_oracle_pseudo_depth', action='store_true',
+                             help='use ground truth depth.')
     self.parser.add_argument('--eval_oracle_dep', action='store_true',
                              help='use ground truth depth.')
 
@@ -353,7 +357,8 @@ class opts(object):
                    'seg': 1}
     elif opt.task == 'polydet':
       opt.heads = {'hm': opt.num_classes,
-                   'poly': opt.nbr_points*2 if not opt.cat_spec_poly else opt.nbr_points*2 * opt.num_classes}
+                   'poly': opt.nbr_points*2 if not opt.cat_spec_poly else opt.nbr_points*2 * opt.num_classes,
+                   'pseudo_depth': 1}
       if opt.reg_offset:
         opt.heads.update({'reg': 2})
     elif opt.task == 'ctdetVid':

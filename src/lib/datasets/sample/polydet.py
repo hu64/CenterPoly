@@ -139,6 +139,7 @@ class PolydetDataset(data.Dataset):
 
     hm = np.zeros((num_classes, output_h, output_w), dtype=np.float32)
     wh = np.zeros((self.max_objs, 2), dtype=np.float32)
+    pseudo_depth = np.zeros((self.max_objs, 1), dtype=np.float32)
     poly = np.zeros((self.max_objs, num_points*2), dtype=np.float32)
     cat_spec_poly = np.zeros((self.max_objs, num_classes * num_points*2), dtype=np.float32)
     cat_spec_mask_poly = np.zeros((self.max_objs, num_classes * num_points*2), dtype=np.uint8)
@@ -159,7 +160,7 @@ class PolydetDataset(data.Dataset):
       bbox = self._coco_box_to_bbox(ann['bbox'])
       ct = np.array(
         [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2], dtype=np.float32)
-
+      pseudo_depth[k] = ann['pseudo_depth']
       points_on_border = ann['poly']
       # poly_img = Image.new('L', (width, height), 0)
       # ImageDraw.Draw(poly_img).polygon(poly_gt, outline=0, fill=255)
@@ -238,9 +239,9 @@ class PolydetDataset(data.Dataset):
       cv2.imwrite(os.path.join('/store/datasets/cityscapes/test_images/polygons/', img_path.replace('/', '_')), cv2.resize(old_inp,  (input_w, input_h)))
 
     if self.opt.cat_spec_poly:
-      ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'poly': poly, 'cat_spec_poly': cat_spec_poly, 'cat_spec_mask': cat_spec_mask_poly}
+      ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'poly': poly, 'cat_spec_poly': cat_spec_poly, 'cat_spec_mask': cat_spec_mask_poly, 'pseudo_depth':pseudo_depth}
     else:
-      ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'poly': poly}
+      ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'poly': poly, 'pseudo_depth':pseudo_depth}
 
     if self.opt.reg_offset:
       ret.update({'reg': reg})

@@ -15,7 +15,7 @@ id_to_file = {}
 for image in anno['images']:
     id_to_file[image['id']] = image['file_name']
 
-results_file = '/usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/oracle_test_new_gt/results.json'
+results_file = '/usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/gt_from_pts/results.json'
 results = json.load(open(results_file, 'r'))
 image_to_boxes = {}
 for result in results:
