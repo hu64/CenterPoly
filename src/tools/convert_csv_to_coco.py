@@ -34,11 +34,26 @@ import cv2
 #            '../../cityscapesStuff/BBoxes/val32_real_points.json':
 #                open('../../cityscapesStuff/BBoxes/val32_real_points.csv', 'r').readlines(),
 #          }
-io_dic = { '../../cityscapesStuff/BBoxes/train16_real_points.json':
-            open('../../cityscapesStuff/BBoxes/train16_real_points.csv', 'r').readlines(),
-           '../../cityscapesStuff/BBoxes/val16_real_points.json':
-               open('../../cityscapesStuff/BBoxes/val16_real_points.csv', 'r').readlines(),
-         }
+# io_dic = { '../../cityscapesStuff/BBoxes/train16_real_points.json':
+#             open('../../cityscapesStuff/BBoxes/train16_real_points.csv', 'r').readlines(),
+#            '../../cityscapesStuff/BBoxes/val16_real_points.json':
+#                open('../../cityscapesStuff/BBoxes/val16_real_points.csv', 'r').readlines(),
+#          }
+# io_dic = { '../../cityscapesStuff/BBoxes/train64_regular_interval.json':
+#             open('../../cityscapesStuff/BBoxes/train64_regular_interval.csv', 'r').readlines(),
+#            '../../cityscapesStuff/BBoxes/val64_regular_interval.json':
+#                open('../../cityscapesStuff/BBoxes/val64_regular_interval.csv', 'r').readlines(),
+#          }
+# io_dic = { '../../cityscapesStuff/BBoxes/train32_regular_interval.json':
+#             open('../../cityscapesStuff/BBoxes/train32_regular_interval.csv', 'r').readlines(),
+#            '../../cityscapesStuff/BBoxes/val32_regular_interval.json':
+#                open('../../cityscapesStuff/BBoxes/val32_regular_interval.csv', 'r').readlines(),
+#          }
+# io_dic = { '../../cityscapesStuff/BBoxes/train16_regular_interval.json':
+#             open('../../cityscapesStuff/BBoxes/train16_regular_interval.csv', 'r').readlines(),
+#            '../../cityscapesStuff/BBoxes/val16_regular_interval.json':
+#                open('../../cityscapesStuff/BBoxes/val16_regular_interval.csv', 'r').readlines(),
+#          }
 
 
 DEBUG = False

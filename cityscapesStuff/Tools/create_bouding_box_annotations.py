@@ -7,7 +7,7 @@ import math
 import bresenham
 from PIL import Image, ImageDraw
 
-METHODS = 'real_points', 'regular_interval'
+METHODS = ['on_border']  # ['regular_interval']  # , 'real_points'
 COARSE = False
 NBR_POINTSS = 16, 32, 64
 # from cityscapes scripts, thee labels have instances:
@@ -92,7 +92,7 @@ max_point_per_polygon = 0
 if COARSE:
     sets = 'train', 'val'
 else:
-    sets = 'train', 'val', 'test'
+    sets = 'train', 'val'  # , 'test'
 
 for method in METHODS:
     for NBR_POINTS in NBR_POINTSS:
@@ -143,11 +143,21 @@ for method in METHODS:
                             poly_img = np.array(poly_img)
                             points_on_box = find_points_from_box(box=bbox, n_points=NBR_POINTS)
                             points_on_border = []
-                            ct = int((x1-x0)/2), int((y1-y0)/2)
+                            ct = int(x0 + ((x1-x0)/2)), int(y0 + ((y1-y0)/2))
                             for point_on_box in points_on_box:
                               line = bresenham.bresenham(int(point_on_box[0]), int(point_on_box[1]), int(ct[0]), int(ct[1]))
                               points_on_border.append(find_first_non_zero_pixel(line, poly_img))
+                            del poly_img
                             object['polygon'] = points_on_border
+
+                        elif method == 'on_border':
+                            points = set(object['polygon'])
+                            for i in range(1, len(object['polygon'])):
+                                for point in bresenham.bresenham(int(object['polygon'][i-1][0]),
+                                                                 int(object['polygon'][i-1][1]),
+                                                                 int(object['polygon'][i][0]),
+                                                                 int(object['polygon'][i][1])):
+                                    points.add(point)
 
 
                         if len(object['polygon']) > max_point_per_polygon:

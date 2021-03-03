@@ -69,6 +69,19 @@ class PolydetLoss(torch.nn.Module):
                 off_loss += self.crit_reg(output['reg'], batch['reg_mask'],
                                           batch['ind'], batch['reg']) / opt.num_stacks
 
+        # import cv2
+        # import os
+        # write_depth = np.array(output['pseudo_depth'][0, :, :, :].cpu().detach().squeeze(0).squeeze(0))
+        # print(write_depth.shape)
+        # write_depth = ((write_depth - np.min(write_depth) / np.max(write_depth)) * 255).astype(np.uint8)
+        # count = 0
+        # write_name = '/store/datasets/cityscapes/test_images/depth/depth' + str(count) + '.jpg'
+        # while os.path.exists(write_name):
+        #     count += 1
+        #     write_name = '/store/datasets/cityscapes/test_images/depth/depth' + str(count) + '.jpg'
+        # cv2.imwrite('/store/datasets/cityscapes/test_images/depth/depth' + str(count) + '.jpg', write_depth)
+        # exit()
+
         loss = opt.hm_weight * hm_loss + opt.off_weight * off_loss + opt.poly_weight * poly_loss + opt.depth_weight * depth_loss
         loss_stats = {'loss': loss, 'hm_loss': hm_loss, 'off_loss': off_loss, 'poly_loss': poly_loss, 'depth_loss': depth_loss}
         return loss, loss_stats

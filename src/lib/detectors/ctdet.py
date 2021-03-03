@@ -30,10 +30,6 @@ class CtdetDetector(BaseDetector):
       output = self.model(images)[-1]
       hm = output['hm'].sigmoid_()
       wh = output['wh']
-      if 'seg' in output:
-        seg = output['seg']  # hughes
-      else:
-        seg = None
       reg = output['reg'] if self.opt.reg_offset else None
       if self.opt.flip_test:
         hm = (hm[0:1] + flip_tensor(hm[1:2])) / 2
@@ -44,7 +40,7 @@ class CtdetDetector(BaseDetector):
       dets = ctdet_decode(hm, wh, reg=reg, cat_spec_wh=self.opt.cat_spec_wh, K=self.opt.K)
       
     if return_time:
-      return output, dets, forward_time, seg
+      return output, dets, forward_time
     else:
       return output, dets
 

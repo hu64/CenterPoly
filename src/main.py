@@ -71,6 +71,7 @@ def main(opt):
   print('Starting training...')
   best = 1e10
   best_AP = 0
+  AP = 0
   for epoch in range(start_epoch + 1, opt.num_epochs + 1):
     mark = epoch if opt.save_all else 'last'
     log_dict_train, _ = trainer.train(epoch, train_loader)
@@ -83,15 +84,15 @@ def main(opt):
                  epoch, model, optimizer)
       with torch.no_grad():
         log_dict_val, preds = trainer.val(epoch, val_loader)
-        if opt.dataset == 'cityscapes':
+        if opt.dataset == 'cityscapes' and opt.task == 'polydet':
             AP = val_loader.dataset.run_eval(preds, opt.save_dir)
             print('AP: ', AP)
       for k, v in log_dict_val.items():
         logger.scalar_summary('val_{}'.format(k), v, epoch)
         logger.write('{} {:8f} | '.format(k, v))
-      if opt.dataset == 'cityscapes':
+      if opt.dataset == 'cityscapes' and opt.task == 'polydet':
         logger.scalar_summary('AP', AP, epoch)
-      if opt.dataset == 'cityscapes':
+      if opt.dataset == 'cityscapes' and opt.task == 'polydet':
           if AP > best_AP:
               best_AP = AP
               save_model(os.path.join(opt.save_dir, 'model_best.pth'),

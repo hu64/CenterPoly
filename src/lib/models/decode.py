@@ -5,6 +5,7 @@ from __future__ import print_function
 import torch
 import torch.nn as nn
 from .utils import _gather_feat, _transpose_and_gather_feat
+import numpy as np
 
 def _nms(heat, kernel=3):
     pad = (kernel - 1) // 2
@@ -525,17 +526,30 @@ def polydet_decode(heat, polys, depth, reg=None, cat_spec_poly=False, K=100):
     clses  = clses.view(batch, K, 1).float()
     scores = scores.view(batch, K, 1)
 
-    poly_points = []
-
     polys[..., 0::2] += xs
     polys[..., 1::2] += ys
+
+    poly_xs = torch.tensor(polys[..., 0::2]).clone().detach()
+    poly_ys = torch.tensor(polys[..., 1::2]).clone().detach()
+
+    poly_xs_min = torch.min(poly_xs, dim=2, keepdim=True)[0]
+    poly_xs_max = torch.max(poly_xs, dim=2, keepdim=True)[0]
+    poly_ys_min = torch.min(poly_ys, dim=2, keepdim=True)[0]
+    poly_ys_max = torch.max(poly_ys, dim=2, keepdim=True)[0]
+
+    # might need that for nms
+    bboxes = torch.cat([poly_xs_min,
+                        poly_ys_min,
+                        poly_xs_max,
+                        poly_ys_max], dim=2)
+
     # for i in range(0, polys.shape[-1], 2):
     #     poly_points.append(xs + polys[..., i:i+1])
     #     poly_points.append(ys + polys[..., i+1:i+2])
     # polys_points = torch.cat(poly_points, dim=2)
     # polys_points = torch.cat(polys, dim=2)
 
-    detections = torch.cat([scores, clses, polys, depth], dim=2)
+    detections = torch.cat([bboxes, scores, clses, polys, depth], dim=2)
 
     return detections
 

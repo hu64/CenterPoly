@@ -127,7 +127,6 @@ class PolydetDataset(data.Dataset):
     if self.split == 'train' and not self.opt.no_color_aug:
       color_aug(self._data_rng, inp, self._eig_val, self._eig_vec)
 
-
     inp = (inp - self.mean) / self.std
     inp = inp.transpose(2, 0, 1)
 
@@ -138,23 +137,20 @@ class PolydetDataset(data.Dataset):
     trans_output = get_affine_transform(c, s, 0, [output_w, output_h])
 
     hm = np.zeros((num_classes, output_h, output_w), dtype=np.float32)
-    wh = np.zeros((self.max_objs, 2), dtype=np.float32)
     pseudo_depth = np.zeros((self.max_objs, 1), dtype=np.float32)
     poly = np.zeros((self.max_objs, num_points*2), dtype=np.float32)
     cat_spec_poly = np.zeros((self.max_objs, num_classes * num_points*2), dtype=np.float32)
     cat_spec_mask_poly = np.zeros((self.max_objs, num_classes * num_points*2), dtype=np.uint8)
     reg = np.zeros((self.max_objs, 2), dtype=np.float32)
-    centers = np.zeros((self.max_objs, 2), dtype=np.float32)
     ind = np.zeros((self.max_objs), dtype=np.int64)
     reg_mask = np.zeros((self.max_objs), dtype=np.uint8)
-    cat_spec_wh = np.zeros((self.max_objs, num_classes * 2), dtype=np.float32)
-    cat_spec_mask = np.zeros((self.max_objs, num_classes * 2), dtype=np.uint8)
 
     if self.opt.elliptical_gt:
       draw_gaussian = draw_ellipse_gaussian
     else:
       draw_gaussian = draw_msra_gaussian if self.opt.mse_loss else draw_umich_gaussian
 
+    gt_det = []
     for k in range(num_objs):
       ann = anns[k]
       bbox = self._coco_box_to_bbox(ann['bbox'])
@@ -194,7 +190,6 @@ class PolydetDataset(data.Dataset):
         ct = np.array(
           [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2], dtype=np.float32)
 
-        wh[k] = 1. * w, 1. * h
         mass_cx, mass_cy = 0, 0
         for i in range(0, len(points_on_border), 2):
           mass_cx += points_on_border[i]
@@ -222,18 +217,16 @@ class PolydetDataset(data.Dataset):
         for i in range(0, len(points_on_border), 2):
           poly[k][i] = points_on_border[i] - ct[0]
           poly[k][i+1] = points_on_border[i+1] - ct[1]
-          cat_spec_poly[k][(cls_id * (num_points*2)) + i] = points_on_border[1] - ct[0]
-          cat_spec_poly[k][(cls_id * (num_points*2)) + (i+1)] = points_on_border[i+1] - ct[1]
-          cat_spec_mask_poly[k][(cls_id * (num_points*2)) + (i*2): (cls_id * (num_points*2)) + (i*2 + 2)] = 1
-        centers[k] = ct[0], ct[1]
-
+          if self.opt.cat_spec_poly:
+            cat_spec_poly[k][(cls_id * (num_points*2)) + i] = points_on_border[1] - ct[0]
+            cat_spec_poly[k][(cls_id * (num_points*2)) + (i+1)] = points_on_border[i+1] - ct[1]
+            cat_spec_mask_poly[k][(cls_id * (num_points*2)) + i: (cls_id * (num_points*2)) + (i + 2)] = 1
 
         ind[k] = ct_int[1] * output_w + ct_int[0]
         reg[k] = ct - ct_int
         reg_mask[k] = 1
-        cat_spec_wh[k, cls_id * 2: cls_id * 2 + 2] = wh[k]
-        cat_spec_mask[k, cls_id * 2: cls_id * 2 + 2] = 1
-
+        gt_det.append([ct[0] - w / 2, ct[1] - h / 2,
+                       ct[0] + w / 2, ct[1] + h / 2, 1, cls_id])
     if DRAW:
       cv2.imwrite(os.path.join('/store/datasets/cityscapes/test_images/polygons/', img_path.replace('/', '_').replace('.jpg', '_instance.jpg')), cv2.resize(instance_img, (input_w, input_h)))
       cv2.imwrite(os.path.join('/store/datasets/cityscapes/test_images/polygons/', img_path.replace('/', '_')), cv2.resize(old_inp,  (input_w, input_h)))
@@ -242,10 +235,11 @@ class PolydetDataset(data.Dataset):
       ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'poly': poly, 'cat_spec_poly': cat_spec_poly, 'cat_spec_mask': cat_spec_mask_poly, 'pseudo_depth':pseudo_depth}
     else:
       ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'poly': poly, 'pseudo_depth':pseudo_depth}
-
+    if self.opt.debug > 0 or not self.split == 'train':
+      gt_det = np.array(gt_det, dtype=np.float32) if len(gt_det) > 0 else \
+        np.zeros((1, 6), dtype=np.float32)
+      meta = {'c': c, 's': s, 'gt_det': gt_det, 'img_id': img_id}
+      ret['meta'] = meta
     if self.opt.reg_offset:
       ret.update({'reg': reg})
-    if self.opt.debug > 0 or not self.split == 'train':
-      meta = {'c': c, 's': s, 'img_id': img_id}
-      ret['meta'] = meta
     return ret

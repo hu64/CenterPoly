@@ -114,11 +114,14 @@ def make_kp_layer(cnv_dim, curr_dim, out_dim):
         nn.Conv2d(curr_dim, out_dim, (1, 1))
     )
 
-
-def make_kp_layer_transformer(cnv_dim, curr_dim, out_dim):
+def make_poly_layer(cnv_dim, curr_dim, out_dim):
     return nn.Sequential(
-        nn.Transformer()
+        # convolution(3, cnv_dim, curr_dim, with_bn=False),
+        # convolution(3, cnv_dim, curr_dim, with_bn=False),
+        convolution(3, cnv_dim, curr_dim, with_bn=False),
+        nn.Conv2d(curr_dim, out_dim, (1, 1))
     )
+
 
 class SqEx(nn.Module):
 
@@ -308,6 +311,7 @@ class exkp(nn.Module):
         make_tl_layer=None, make_br_layer=None,
         make_cnv_layer=make_cnv_layer, make_heat_layer=make_kp_layer,
         make_tag_layer=make_kp_layer, make_regr_layer=make_kp_layer,
+        make_poly_layer=make_poly_layer,
         make_up_layer=make_layer, make_low_layer=make_layer,
         make_hg_layer=make_layer, make_hg_layer_revr=make_layer_revr,
         make_pool_layer=make_pool_layer, make_unpool_layer=make_unpool_layer,
@@ -372,6 +376,12 @@ class exkp(nn.Module):
                 self.__setattr__(head, module)
                 for heat in self.__getattr__(head):
                     heat[-1].bias.data.fill_(-2.19)
+            elif 'poly' in head:
+                module = nn.ModuleList([
+                    make_poly_layer(
+                        cnv_dim, curr_dim, heads[head]) for _ in range(nstack)
+                ])
+                self.__setattr__(head, module)
             else:
                 module = nn.ModuleList([
                     make_regr_layer(

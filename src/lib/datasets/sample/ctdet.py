@@ -100,10 +100,10 @@ class CTDetDataset(data.Dataset):
 
     if self.opt.elliptical_gt:
       draw_gaussian = draw_ellipse_gaussian
-      # # print('elliptical')
+      # print('elliptical')
     else:
       draw_gaussian = draw_msra_gaussian if self.opt.mse_loss else draw_umich_gaussian
-      print('not elliptical')
+      # print('not elliptical')
 
     gt_det = []
     for k in range(num_objs):

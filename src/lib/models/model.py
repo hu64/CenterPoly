@@ -42,8 +42,6 @@ def load_model(model, model_path, optimizer=None, resume=False,
       state_dict[k] = state_dict_[k]
   model_state_dict = model.state_dict()
 
-  loaded_state_dict = state_dict.copy()
-
   # check loaded parameters and created model parameters
   msg = 'If you see this, your model does not fully load the ' + \
         'pre-trained weight. Please make sure ' + \
@@ -62,6 +60,30 @@ def load_model(model, model_path, optimizer=None, resume=False,
     if not (k in state_dict):
       print('No param {}.'.format(k) + msg)
       state_dict[k] = model_state_dict[k]
+
+  EXT_D = False
+  if EXT_D:
+    D_W = torch.load('../exp/cityscapes/polydet/resnet18_32pts_2/model_best.pth',
+                     map_location=lambda storage, loc: storage)
+    d_state_dict = D_W['state_dict']
+    for k in d_state_dict:
+      if 'depth' in k:
+        print('depth: ', k)
+        model_state_dict[k] = d_state_dict[k]
+        state_dict[k] = d_state_dict[k]
+  EXT_Poly = False
+  if EXT_Poly:
+    Poly_W = torch.load('../exp/cityscapes/polydet/newgt_pw10_lr2e4/model_best.pth',
+                        map_location=lambda storage, loc: storage)
+    poly_state_dict = Poly_W['state_dict']
+    for k in poly_state_dict:
+      if 'poly' in k or 'cnvs' in k:
+        print('poly: ', k)
+        model_state_dict[k] = poly_state_dict[k]
+        state_dict[k] = poly_state_dict[k]
+
+  loaded_state_dict = state_dict.copy()
+
   model.load_state_dict(state_dict, strict=False)
 
   # resume optimizer parameters
@@ -82,9 +104,7 @@ def load_model(model, model_path, optimizer=None, resume=False,
   FREEZE_LAYERS = False
   if FREEZE_LAYERS:
     for name, param in model.named_parameters():
-      if name in loaded_state_dict and not 'poly' in name and not 'reg' in name:
-        # if name in loaded_state_dict and not 'Fusion' in name:
-        # if name in loaded_state_dict and not 'reg' in name and not 'seg' in name and ('kps' in name or 'pre' in name):
+      if name in loaded_state_dict and not 'poly' in name and not 'depth' in name:
         # print('Freeze: ', name)
         param.requires_grad = False
         param.freeze = True

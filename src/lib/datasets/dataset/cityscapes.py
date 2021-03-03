@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageChops
 import torch.utils.data as data
 import glob
 from multiprocessing import Pool
+from pycocotools.cocoeval import COCOeval
 
 
 def write_mask_image(args):
@@ -24,6 +25,7 @@ def write_mask_image(args):
 
 class CITYSCAPES(data.Dataset):
     num_classes = 8
+    # default_resolution = [1024, 2048]
     default_resolution = [512, 1024]
     # default_resolution = [512, 512]
 
@@ -42,10 +44,11 @@ class CITYSCAPES(data.Dataset):
         if split == 'test':
             self.annot_path = os.path.join(base_dir, 'test.json')
         elif split == 'val':
-            self.annot_path = os.path.join(base_dir, 'val' + str(self.opt.nbr_points) + '_real_points.json')
+            self.annot_path = os.path.join(base_dir, 'val' + str(self.opt.nbr_points) + '_regular_interval.json')
+            # self.annot_path = os.path.join(base_dir, 'val' + str(self.opt.nbr_points) + '_real_points.json')
         else:
-            # self.annot_path = os.path.join(base_dir, 'train' + str(self.opt.nbr_points) + '.json')
-            self.annot_path = os.path.join(base_dir, 'train' + str(self.opt.nbr_points) + '_real_points.json')
+            self.annot_path = os.path.join(base_dir, 'train' + str(self.opt.nbr_points) + '_regular_interval.json')
+            # self.annot_path = os.path.join(base_dir, 'train' + str(self.opt.nbr_points) + '_real_points.json')
 
         self.max_objs = 128
         self.class_name = [
@@ -102,6 +105,28 @@ class CITYSCAPES(data.Dataset):
                     detections.append(detection)
         return detections
 
+    def convert_polygon_eval_format(self, all_bboxes):
+        # import pdb; pdb.set_trace()
+        detections = []
+        for image_id in all_bboxes:
+            for cls_ind in all_bboxes[image_id]:
+                category_id = self._valid_ids[cls_ind - 1]
+                for bbox in all_bboxes[image_id][cls_ind]:
+                    score = bbox[4]
+                    depth = bbox[-1]
+                    label = self.class_name[cls_ind]
+                    polygon = list(map(self._to_float, bbox[5:]))
+
+                    detection = {
+                        "image_id": int(image_id),
+                        "category_id": int(category_id),
+                        "polygon": polygon,
+                        "score": float("{:.2f}".format(score)),
+                        "depth": float(depth),
+                    }
+                    detections.append(detection)
+        return detections
+
     def format_and_write_to_cityscapes(self, all_bboxes, save_dir):
         id_to_file = {}
         anno = json.load(open(self.annot_path))
@@ -120,11 +145,11 @@ class CITYSCAPES(data.Dataset):
                 param_list = []
                 to_remove_mask = Image.new('L', (2048, 1024), 1)
                 for bbox in all_bboxes[image_id][cls_ind]:
-                    if bbox[0] > 0:
-                        score = str(bbox[0])
+                    if bbox[4] > 0.05:
+                        score = str(bbox[4])
                         depth = bbox[-1]
                         label = self.class_name[cls_ind]
-                        polygon = list(map(self._to_float, bbox[2:]))
+                        polygon = list(map(self._to_float, bbox[5:]))
                         # poly_points = []
                         # for i in range(0, len(polygon)-1, 2):
                         #     poly_points.append((int(polygon[i]), int(polygon[i+1])))
@@ -144,7 +169,7 @@ class CITYSCAPES(data.Dataset):
                     polygon_mask = Image.new('L', (2048, 1024), 0)
                     ImageDraw.Draw(polygon_mask).polygon(poly_points, outline=0, fill=255)
                     polygon_mask = Image.fromarray(np.array(polygon_mask) * np.array(to_remove_mask))
-                    if score >= 0.25:
+                    if score >= 0.5:
                         ImageDraw.Draw(to_remove_mask).polygon(poly_points, outline=0, fill=0)
                     polygon_mask.save(mask_path)
         # with Pool(processes=4) as pool:
@@ -154,28 +179,42 @@ class CITYSCAPES(data.Dataset):
         return self.num_samples
 
     def save_results(self, results, save_dir):
-        json.dump(self.convert_eval_format(results),
-                  open('{}/results.json'.format(save_dir), 'w'))
+        if self.opt.task == 'polydet':
+            json.dump(self.convert_polygon_eval_format(results),
+                      open('{}/results.json'.format(save_dir), 'w'))
+        else:
+            json.dump(self.convert_eval_format(results),
+                      open('{}/results.json'.format(save_dir), 'w'))
 
     def run_eval(self, results, save_dir):
-        self.save_results(results, save_dir)
-        res_dir = os.path.join(save_dir, 'results')
-        if not os.path.exists(res_dir):
-            os.mkdir(res_dir)
-        to_delete = os.path.join(save_dir, 'results/*.txt')
-        files = glob.glob(to_delete)
-        for f in files:
-            os.remove(f)
-        to_delete = os.path.join(save_dir, 'results/*/*.png')
-        files = glob.glob(to_delete)
-        for f in files:
-            os.remove(f)
-        self.format_and_write_to_cityscapes(results, res_dir)
-        os.environ['CITYSCAPES_DATASET'] = '/store/datasets/cityscapes'
-        os.environ['CITYSCAPES_RESULTS'] = res_dir
-        from datasets.evaluation.cityscapesscripts.evaluation import evalInstanceLevelSemanticLabeling
-        AP = evalInstanceLevelSemanticLabeling.getAP()
-        return AP
+        if self.opt.task == 'ctdet':
+            self.save_results(results, save_dir)
+            coco_dets = self.coco.loadRes('{}/results.json'.format(save_dir))
+            coco_eval = COCOeval(self.coco, coco_dets, "bbox")
+            # coco_eval.params.catIds = [2, 3, 4, 6, 7, 8, 10, 11, 12, 13]
+            coco_eval.evaluate()
+            coco_eval.accumulate()
+            coco_eval.summarize()
+        else:
+            self.save_results(results, save_dir)
+            res_dir = os.path.join(save_dir, 'results')
+            if not os.path.exists(res_dir):
+                os.mkdir(res_dir)
+            to_delete = os.path.join(save_dir, 'results/*.txt')
+            files = glob.glob(to_delete)
+            for f in files:
+                os.remove(f)
+            to_delete = os.path.join(save_dir, 'results/*/*.png')
+            files = glob.glob(to_delete)
+            for f in files:
+                os.remove(f)
+            self.format_and_write_to_cityscapes(results, res_dir)
+            os.environ['CITYSCAPES_DATASET'] = '/store/datasets/cityscapes'
+            os.environ['CITYSCAPES_RESULTS'] = res_dir
+            from datasets.evaluation.cityscapesscripts.evaluation import evalInstanceLevelSemanticLabeling
+            AP = evalInstanceLevelSemanticLabeling.getAP()
+            return AP
+            # return 0
 
 # os.environ['CITYSCAPES_DATASET'] = '/store/datasets/cityscapes'
 # os.environ['CITYSCAPES_RESULTS'] = '/usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/oracle_test_new_gt/results'
