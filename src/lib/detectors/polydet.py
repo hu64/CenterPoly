@@ -47,25 +47,25 @@ class PolydetDetector(BaseDetector):
     length = len(dets[0][1][0])
     for j in range(1, self.num_classes + 1):
       dets[0][j] = np.array(dets[0][j], dtype=np.float32).reshape(-1, length)
-      # dets[0][j] = np.array(dets[0][j], dtype=np.float32).reshape(-1, 5)
+      dets[0][j][:, :4] /= scale
+      # dets[0][j][:, 5:-1] /= scale
       dets[0][j][:, 5:-1] /= scale
     return dets[0]
 
   def merge_outputs(self, detections):
     results = {}
     for j in range(1, self.num_classes + 1):
-      results[j] = np.concatenate(
-        [detection[j] for detection in detections], axis=0).astype(np.float32)
+      results[j] = np.concatenate([detection[j] for detection in detections], axis=0).astype(np.float32)
       if len(self.scales) > 1 or self.opt.nms:
         soft_nms(results[j], Nt=0.5, method=2)
-    scores = np.hstack(
-      [results[j][:, 4] for j in range(1, self.num_classes + 1)])
+    scores = np.hstack([results[j][:, 4] for j in range(1, self.num_classes + 1)])
     if len(scores) > self.max_per_image:
       kth = len(scores) - self.max_per_image
       thresh = np.partition(scores, kth)[kth]
       for j in range(1, self.num_classes + 1):
         keep_inds = (results[j][:, 4] >= thresh)
         results[j] = results[j][keep_inds]
+
     return results
 
   def debug(self, debugger, images, dets, output, scale=1):

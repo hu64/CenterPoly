@@ -63,7 +63,7 @@ def load_model(model, model_path, optimizer=None, resume=False,
 
   EXT_D = False
   if EXT_D:
-    D_W = torch.load('../exp/cityscapes/polydet/resnet18_32pts_2/model_best.pth',
+    D_W = torch.load('../exp/cityscapes/polydet/from_ctdet_unet/model_best.pth',
                      map_location=lambda storage, loc: storage)
     d_state_dict = D_W['state_dict']
     for k in d_state_dict:
@@ -73,7 +73,7 @@ def load_model(model, model_path, optimizer=None, resume=False,
         state_dict[k] = d_state_dict[k]
   EXT_Poly = False
   if EXT_Poly:
-    Poly_W = torch.load('../exp/cityscapes/polydet/newgt_pw10_lr2e4/model_best.pth',
+    Poly_W = torch.load('../exp/cityscapes/polydet/from_ctdet_unet/model_best.pth',
                         map_location=lambda storage, loc: storage)
     poly_state_dict = Poly_W['state_dict']
     for k in poly_state_dict:
@@ -104,7 +104,7 @@ def load_model(model, model_path, optimizer=None, resume=False,
   FREEZE_LAYERS = False
   if FREEZE_LAYERS:
     for name, param in model.named_parameters():
-      if name in loaded_state_dict and not 'poly' in name and not 'depth' in name:
+      if name in loaded_state_dict and ('pre' in name or 'kps' in name):
         # print('Freeze: ', name)
         param.requires_grad = False
         param.freeze = True

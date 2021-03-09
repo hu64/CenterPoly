@@ -8,16 +8,16 @@ import os
 import json
 import cv2
 
-TRESH = 0.25
+TRESH = 0.3
 base_dir = '/store/datasets/cityscapes'
-anno = json.load(open('../BBoxes/val.json', 'r'))
-# anno = json.load(open('../BBoxes/test.json', 'r'))
+# anno = json.load(open('../BBoxes/val.json', 'r'))
+anno = json.load(open('../BBoxes/test.json', 'r'))
 
 id_to_file = {}
 for image in anno['images']:
     id_to_file[image['id']] = image['file_name']
 
-results_file = '/usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/from_ctdet_smhg_1cnv_16/results.json'
+results_file = '/usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/from_coco_ext_poly_ext_depth/results.json'
 results = json.load(open(results_file, 'r'))
 image_to_boxes = {}
 for result in results:
@@ -25,7 +25,7 @@ for result in results:
     box += [result['category_id']]
     if 'polygon' in result:
         box += [result['depth']]
-        box += list(result['polygon'])[:-1]
+        box += list(result['polygon'])
     else:
         # box += [result['category_id']]
         x0, y0, w, h = list(result['bbox'])

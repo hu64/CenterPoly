@@ -114,6 +114,39 @@ def make_kp_layer(cnv_dim, curr_dim, out_dim):
         nn.Conv2d(curr_dim, out_dim, (1, 1))
     )
 
+
+# from: https://github.com/milesial/Pytorch-UNet/blob/master/unet/unet_parts.py
+class poly_module(nn.Module):
+    def __init__(self, curr_dim, out_dim, **kwargs):
+        super(poly_module, self).__init__()
+
+        self.n_channels = curr_dim
+
+        self.inc = DoubleConv(self.n_channels, 64)
+        self.down1 = Down(64, 128)
+        self.down2 = Down(128, 256)
+        self.down3 = Down(256, 512)
+        self.down4 = Down(512, 512)
+        self.up1 = Up(1024, 256)
+        self.up2 = Up(512, 128)
+        self.up3 = Up(256, 64)
+        self.up4 = Up(128, 64)
+        self.outc = OutConv(64, out_dim)
+
+    def forward(self, x):
+        x1 = self.inc(x)
+        x2 = self.down1(x1)
+        x3 = self.down2(x2)
+        x4 = self.down3(x3)
+        x5 = self.down4(x4)
+        x = self.up1(x5, x4)
+        x = self.up2(x, x3)
+        x = self.up3(x, x2)
+        x = self.up4(x, x1)
+        logits = self.outc(x)
+        # out = logits.sigmoid()
+        return logits
+
 def make_poly_layer(cnv_dim, curr_dim, out_dim):
     return nn.Sequential(
         # convolution(3, cnv_dim, curr_dim, with_bn=False),
@@ -377,10 +410,8 @@ class exkp(nn.Module):
                 for heat in self.__getattr__(head):
                     heat[-1].bias.data.fill_(-2.19)
             elif 'poly' in head:
-                module = nn.ModuleList([
-                    make_poly_layer(
-                        cnv_dim, curr_dim, heads[head]) for _ in range(nstack)
-                ])
+                # module = nn.ModuleList([poly_module(curr_dim, heads[head]) for _ in range(nstack)])
+                module = nn.ModuleList([make_poly_layer(cnv_dim, curr_dim, heads[head]) for _ in range(nstack)])
                 self.__setattr__(head, module)
             else:
                 module = nn.ModuleList([

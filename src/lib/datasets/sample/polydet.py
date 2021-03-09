@@ -154,10 +154,7 @@ class PolydetDataset(data.Dataset):
     for k in range(num_objs):
       ann = anns[k]
       bbox = self._coco_box_to_bbox(ann['bbox'])
-      ct = np.array(
-        [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2], dtype=np.float32)
       pseudo_depth[k] = ann['pseudo_depth']
-      points_on_border = ann['poly']
       # poly_img = Image.new('L', (width, height), 0)
       # ImageDraw.Draw(poly_img).polygon(poly_gt, outline=0, fill=255)
       # poly_img = np.array(poly_img)
@@ -168,6 +165,7 @@ class PolydetDataset(data.Dataset):
       #   points_on_border.append(find_first_non_zero_pixel(line, poly_img))
       # del(poly_img)
       cls_id = int(self.cat_ids[ann['category_id']])
+      points_on_border = ann['poly']
       if flipped:
         bbox[[0, 2]] = width - bbox[[2, 0]] - 1
         for i in range(0, len(points_on_border), 2):
@@ -196,7 +194,7 @@ class PolydetDataset(data.Dataset):
           mass_cy += points_on_border[i+1]
         ct[0] = mass_cx / (len(points_on_border)/2)
         ct[1] = mass_cy / (len(points_on_border)/2)
-        ct_int = ct.astype(int)
+        ct_int = ct.astype(np.int32)
 
         if DRAW:
           pts = np.array(points_on_border, np.int32)
@@ -204,6 +202,7 @@ class PolydetDataset(data.Dataset):
           old_inp = cv2.resize(old_inp, (output_w, output_h))
           old_inp = cv2.polylines(old_inp, [pts], True, (0, 255, 255))
           old_inp = cv2.rectangle(old_inp, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 0, 255))
+          old_inp = cv2.circle(old_inp, tuple(ct_int), 1, (0, 255, 255), 1)
 
         if self.opt.elliptical_gt:
           radius_x = radius if h > w else int(radius * (w / h))

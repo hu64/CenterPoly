@@ -100,8 +100,8 @@ class CITYSCAPES(data.Dataset):
                         "score": float("{:.2f}".format(score))
                     }
                     if len(bbox) > 5:
-                        polys = list(map(self._to_float, bbox[5:]))
-                        detection["polygons"] = polys
+                        extreme_points = list(map(self._to_float, bbox[5:13]))
+                        detection["extreme_points"] = extreme_points
                     detections.append(detection)
         return detections
 
@@ -115,7 +115,7 @@ class CITYSCAPES(data.Dataset):
                     score = bbox[4]
                     depth = bbox[-1]
                     label = self.class_name[cls_ind]
-                    polygon = list(map(self._to_float, bbox[5:]))
+                    polygon = list(map(self._to_float, bbox[5:-1]))
 
                     detection = {
                         "image_id": int(image_id),
@@ -149,7 +149,7 @@ class CITYSCAPES(data.Dataset):
                         score = str(bbox[4])
                         depth = bbox[-1]
                         label = self.class_name[cls_ind]
-                        polygon = list(map(self._to_float, bbox[5:]))
+                        polygon = list(map(self._to_float, bbox[5:-1]))
                         # poly_points = []
                         # for i in range(0, len(polygon)-1, 2):
                         #     poly_points.append((int(polygon[i]), int(polygon[i+1])))
@@ -159,12 +159,12 @@ class CITYSCAPES(data.Dataset):
                         # polygon_mask.save(mask_path)
                         text_file.write('masks/' + os.path.basename(mask_path) + ' ' + str(self.label_to_id[label]) + ' ' + score + '\n')
                         count += 1
-                        param_list.append((polygon, mask_path, float(bbox[0]), depth))
+                        param_list.append((polygon, mask_path, bbox[4], depth))
 
                 for args in sorted(param_list, key=lambda x: x[-1]):
                     polygon, mask_path, score, depth = args
                     poly_points = []
-                    for i in range(0, len(polygon) - 1, 2):
+                    for i in range(0, len(polygon), 2):
                         poly_points.append((int(polygon[i]), int(polygon[i + 1])))
                     polygon_mask = Image.new('L', (2048, 1024), 0)
                     ImageDraw.Draw(polygon_mask).polygon(poly_points, outline=0, fill=255)

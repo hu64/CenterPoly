@@ -529,8 +529,8 @@ def polydet_decode(heat, polys, depth, reg=None, cat_spec_poly=False, K=100):
     polys[..., 0::2] += xs
     polys[..., 1::2] += ys
 
-    poly_xs = torch.tensor(polys[..., 0::2]).clone().detach()
-    poly_ys = torch.tensor(polys[..., 1::2]).clone().detach()
+    poly_xs = polys[..., 0::2].clone().detach()
+    poly_ys = polys[..., 1::2].clone().detach()
 
     poly_xs_min = torch.min(poly_xs, dim=2, keepdim=True)[0]
     poly_xs_max = torch.max(poly_xs, dim=2, keepdim=True)[0]
