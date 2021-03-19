@@ -61,9 +61,19 @@ def load_model(model, model_path, optimizer=None, resume=False,
       print('No param {}.'.format(k) + msg)
       state_dict[k] = model_state_dict[k]
 
+  EXT_HM = False
+  if EXT_HM:
+    HM_W = torch.load('../exp/uadetrac1on10_b/ctdet/ctdet/model_best.pth',
+                     map_location=lambda storage, loc: storage)
+    hm_state_dict = HM_W['state_dict']
+    for k in hm_state_dict:
+      if 'hm' in k:
+        print('hm: ', k)
+        model_state_dict[k] = hm_state_dict[k]
+        state_dict[k] = hm_state_dict[k]
   EXT_D = False
   if EXT_D:
-    D_W = torch.load('../exp/cityscapes/polydet/from_ctdet_unet/model_best.pth',
+    D_W = torch.load('../exp/cityscapes/polydet/from_ctdet_smhg_1cnv_16/model_best.pth',
                      map_location=lambda storage, loc: storage)
     d_state_dict = D_W['state_dict']
     for k in d_state_dict:
@@ -73,11 +83,11 @@ def load_model(model, model_path, optimizer=None, resume=False,
         state_dict[k] = d_state_dict[k]
   EXT_Poly = False
   if EXT_Poly:
-    Poly_W = torch.load('../exp/cityscapes/polydet/from_ctdet_unet/model_best.pth',
+    Poly_W = torch.load('../exp/cityscapes/polydet/from_ctdet_smhg_1cnv_16/model_best.pth',
                         map_location=lambda storage, loc: storage)
     poly_state_dict = Poly_W['state_dict']
     for k in poly_state_dict:
-      if 'poly' in k or 'cnvs' in k:
+      if 'poly' in k:
         print('poly: ', k)
         model_state_dict[k] = poly_state_dict[k]
         state_dict[k] = poly_state_dict[k]
@@ -104,7 +114,7 @@ def load_model(model, model_path, optimizer=None, resume=False,
   FREEZE_LAYERS = False
   if FREEZE_LAYERS:
     for name, param in model.named_parameters():
-      if name in loaded_state_dict and ('pre' in name or 'kps' in name):
+      if name in loaded_state_dict and (not 'hm' in name):
         # print('Freeze: ', name)
         param.requires_grad = False
         param.freeze = True

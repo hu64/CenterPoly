@@ -215,8 +215,3 @@ class CITYSCAPES(data.Dataset):
             AP = evalInstanceLevelSemanticLabeling.getAP()
             return AP
             # return 0
-
-# os.environ['CITYSCAPES_DATASET'] = '/store/datasets/cityscapes'
-# os.environ['CITYSCAPES_RESULTS'] = '/usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/oracle_test_new_gt/results'
-# from datasets.evaluation.cityscapesscripts.evaluation import evalInstanceLevelSemanticLabeling
-# AP = evalInstanceLevelSemanticLabeling.getAP()

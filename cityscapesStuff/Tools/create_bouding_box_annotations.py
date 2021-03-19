@@ -7,9 +7,9 @@ import math
 import bresenham
 from PIL import Image, ImageDraw
 
-METHODS = ['on_border']  # ['regular_interval']  # , 'real_points'
+METHODS = ['regular_interval']  # , 'real_points'
 COARSE = False
-NBR_POINTSS = 16, 32, 64
+NBR_POINTSS = [8]  # 16, 32, 64
 # from cityscapes scripts, thee labels have instances:
 have_instances = ['person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle']
 

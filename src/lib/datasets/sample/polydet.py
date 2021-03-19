@@ -78,7 +78,7 @@ class PolydetDataset(data.Dataset):
     num_points = self.opt.nbr_points
     img = cv2.imread(img_path)
     height, width = img.shape[0], img.shape[1]
-    instance_img = cv2.resize(cv2.imread(instance_path, 0), (width, height))
+    # instance_img = cv2.resize(cv2.imread(instance_path, 0), (width, height))
 
     c = np.array([img.shape[1] / 2., img.shape[0] / 2.], dtype=np.float32)
     if self.opt.keep_res:
@@ -108,7 +108,7 @@ class PolydetDataset(data.Dataset):
         flipped = True
 
         img = img[:, ::-1, :]
-        instance_img = instance_img[:, ::-1]
+        # instance_img = instance_img[:, ::-1]
         c[0] =  width - c[0] - 1
 
     trans_input = get_affine_transform(
@@ -116,9 +116,9 @@ class PolydetDataset(data.Dataset):
     inp = cv2.warpAffine(img, trans_input,
                          (input_w, input_h),
                          flags=cv2.INTER_LINEAR)
-    instance_img = cv2.warpAffine(instance_img, trans_input,
-                         (input_w, input_h),
-                         flags=cv2.INTER_LINEAR)
+    # instance_img = cv2.warpAffine(instance_img, trans_input,
+    #                      (input_w, input_h),
+    #                      flags=cv2.INTER_LINEAR)
 
     if DRAW:
       old_inp = inp.copy()
@@ -132,7 +132,7 @@ class PolydetDataset(data.Dataset):
 
     output_h = input_h // self.opt.down_ratio
     output_w = input_w // self.opt.down_ratio
-    instance_img = cv2.resize(instance_img, (output_w, output_h))
+    # instance_img = cv2.resize(instance_img, (output_w, output_h))
     num_classes = self.num_classes
     trans_output = get_affine_transform(c, s, 0, [output_w, output_h])
 
@@ -154,6 +154,7 @@ class PolydetDataset(data.Dataset):
     for k in range(num_objs):
       ann = anns[k]
       bbox = self._coco_box_to_bbox(ann['bbox'])
+
       pseudo_depth[k] = ann['pseudo_depth']
       # poly_img = Image.new('L', (width, height), 0)
       # ImageDraw.Draw(poly_img).polygon(poly_gt, outline=0, fill=255)
@@ -168,6 +169,7 @@ class PolydetDataset(data.Dataset):
       points_on_border = ann['poly']
       if flipped:
         bbox[[0, 2]] = width - bbox[[2, 0]] - 1
+      # exp
         for i in range(0, len(points_on_border), 2):
           points_on_border[i] = width - points_on_border[i] - 1
       for i in range(0, len(points_on_border), 2):
@@ -187,7 +189,7 @@ class PolydetDataset(data.Dataset):
 
         ct = np.array(
           [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2], dtype=np.float32)
-
+        # exp
         mass_cx, mass_cy = 0, 0
         for i in range(0, len(points_on_border), 2):
           mass_cx += points_on_border[i]
@@ -196,6 +198,7 @@ class PolydetDataset(data.Dataset):
         ct[1] = mass_cy / (len(points_on_border)/2)
         ct_int = ct.astype(np.int32)
 
+        #exp
         if DRAW:
           pts = np.array(points_on_border, np.int32)
           pts = pts.reshape((-1, 1, 2))
@@ -213,6 +216,7 @@ class PolydetDataset(data.Dataset):
 
         # points_on_border = np.array(points_on_border).astype(np.float32)
         # print(points_on_border)
+        #exp
         for i in range(0, len(points_on_border), 2):
           poly[k][i] = points_on_border[i] - ct[0]
           poly[k][i+1] = points_on_border[i+1] - ct[1]
@@ -227,7 +231,7 @@ class PolydetDataset(data.Dataset):
         gt_det.append([ct[0] - w / 2, ct[1] - h / 2,
                        ct[0] + w / 2, ct[1] + h / 2, 1, cls_id])
     if DRAW:
-      cv2.imwrite(os.path.join('/store/datasets/cityscapes/test_images/polygons/', img_path.replace('/', '_').replace('.jpg', '_instance.jpg')), cv2.resize(instance_img, (input_w, input_h)))
+      # cv2.imwrite(os.path.join('/store/datasets/cityscapes/test_images/polygons/', img_path.replace('/', '_').replace('.jpg', '_instance.jpg')), cv2.resize(instance_img, (input_w, input_h)))
       cv2.imwrite(os.path.join('/store/datasets/cityscapes/test_images/polygons/', img_path.replace('/', '_')), cv2.resize(old_inp,  (input_w, input_h)))
 
     if self.opt.cat_spec_poly:

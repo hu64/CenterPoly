@@ -82,6 +82,7 @@ class PolydetLoss(torch.nn.Module):
         # cv2.imwrite('/store/datasets/cityscapes/test_images/depth/depth' + str(count) + '.jpg', write_depth)
         # exit()
 
+        # loss = opt.hm_weight * hm_loss + opt.off_weight * off_loss + opt.poly_weight * poly_loss + opt.depth_weight * depth_loss
         loss = opt.hm_weight * hm_loss + opt.off_weight * off_loss + opt.poly_weight * poly_loss + opt.depth_weight * depth_loss
         loss_stats = {'loss': loss, 'hm_loss': hm_loss, 'off_loss': off_loss, 'poly_loss': poly_loss, 'depth_loss': depth_loss}
         return loss, loss_stats

@@ -180,7 +180,7 @@ class SqEx(nn.Module):
         return y
 
 
-def make_SqEx_layer(curr_dim):  # hughes
+def make_SqEx_layer(curr_dim):
     return nn.Sequential(
         SqEx(curr_dim),
     )

@@ -29,7 +29,7 @@ class CtdetLoss(torch.nn.Module):
 
     def forward(self, outputs, batch):
         opt = self.opt
-        hm_loss, wh_loss, off_loss = 0, 0, 0  # hughes
+        hm_loss, wh_loss, off_loss = 0, 0, 0
         for s in range(opt.num_stacks):
             output = outputs[s]
             if not opt.mse_loss:
@@ -85,7 +85,7 @@ class CtdetLoss(torch.nn.Module):
         loss = opt.hm_weight * hm_loss + opt.wh_weight * wh_loss + \
                opt.off_weight * off_loss
         loss_stats = {'loss': loss, 'hm_loss': hm_loss,
-                      'wh_loss': wh_loss, 'off_loss': off_loss}  # hughes
+                      'wh_loss': wh_loss, 'off_loss': off_loss}
         return loss, loss_stats
 
 

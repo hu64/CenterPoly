@@ -14,7 +14,7 @@ import torch.utils.data as data
 class UADETRAC1ON10_b(data.Dataset):
     num_classes = 1
     # default_resolution = [512, 512]
-    default_resolution = [512, 896]
+    default_resolution = [512, 1024]
 
     mean = np.array([0.40789654, 0.44719302, 0.47026115],
                     dtype=np.float32).reshape(1, 1, 3)
@@ -26,8 +26,6 @@ class UADETRAC1ON10_b(data.Dataset):
         self.data_dir = os.path.join(opt.data_dir, 'coco')
         self.img_dir = os.path.join(self.data_dir, '{}2017'.format(split))
 
-        base_dir = '/store/datasets/UA-Detrac' if os.path.exists('/store/datasets/UA-Detrac') else \
-            '/home/travail/huper/datasets/UA-Detrac'
         if split == 'test':
             self.annot_path = os.path.join(base_dir, 'COCO-format/test-1-on-200_b.json')
         elif split == 'val':
@@ -94,9 +92,35 @@ class UADETRAC1ON10_b(data.Dataset):
     def __len__(self):
         return self.num_samples
 
+    def convert_polygon_eval_format(self, all_bboxes):
+        # import pdb; pdb.set_trace()
+        detections = []
+        for image_id in all_bboxes:
+            for cls_ind in all_bboxes[image_id]:
+                category_id = self._valid_ids[cls_ind - 1]
+                for bbox in all_bboxes[image_id][cls_ind]:
+                    score = bbox[4]
+                    depth = bbox[-1]
+                    label = self.class_name[cls_ind]
+                    polygon = list(map(self._to_float, bbox[5:-1]))
+
+                    detection = {
+                        "image_id": int(image_id),
+                        "category_id": int(category_id),
+                        "polygon": polygon,
+                        "score": float("{:.2f}".format(score)),
+                        "depth": float(depth),
+                    }
+                    detections.append(detection)
+        return detections
+
     def save_results(self, results, save_dir):
-        json.dump(self.convert_eval_format(results),
-                  open('{}/results.json'.format(save_dir), 'w'))
+        if self.opt.task == 'polydet':
+            json.dump(self.convert_polygon_eval_format(results),
+                      open('{}/results.json'.format(save_dir), 'w'))
+        else:
+            json.dump(self.convert_eval_format(results),
+                      open('{}/results.json'.format(save_dir), 'w'))
 
     def bb_intersection_fraction(self, boxA, boxB):
         # determine the (x, y)-coordinates of the intersection rectangle
@@ -198,7 +222,7 @@ class UADETRAC1ON10_b(data.Dataset):
         # detections  = self.convert_eval_format(results)
         # json.dump(detections, open(result_json, "w"))
         # results = self.clear_ignrs_from_results(results)
-        results = self.fix_res(results)
+        # results = self.fix_res(results)
         self.save_results(results, save_dir)
         coco_dets = self.coco.loadRes('{}/results.json'.format(save_dir))
         coco_eval = COCOeval(self.coco, coco_dets, "bbox")

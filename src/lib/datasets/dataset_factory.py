@@ -12,12 +12,14 @@ from .dataset.coco import COCO
 from .dataset.pascal import PascalVOC
 from .dataset.kitti import KITTI
 from .dataset.kitti2d import KITTI2D
+from .dataset.kitti_poly import KITTIPOLY
 from .dataset.coco_hp import COCOHP
 from .dataset.uadetrac import UADETRAC
 from .dataset.uadetrac1on10 import UADETRAC1ON10
 from .dataset.uadetrac1on10_b import UADETRAC1ON10_b
 from .dataset.uav import UAV
 from .dataset.cityscapes import CITYSCAPES
+from .dataset.IDD import IDD
 
 
 dataset_factory = {
@@ -25,12 +27,14 @@ dataset_factory = {
   'pascal': PascalVOC,
   'kitti': KITTI,
   'kitti2d': KITTI2D,
+  'kitti_poly': KITTIPOLY,
   'coco_hp': COCOHP,
   'uadetrac': UADETRAC,
   'uadetrac1on10': UADETRAC1ON10,
   'uadetrac1on10_b': UADETRAC1ON10_b,
   'uav': UAV,
   'cityscapes': CITYSCAPES,
+  'IDD': IDD,
 
 }
 

@@ -110,17 +110,17 @@ class CTDetDataset(data.Dataset):
       ann = anns[k]
       bbox = self._coco_box_to_bbox(ann['bbox'])
       cls_id = int(self.cat_ids[ann['category_id']])
-      points_on_border = ann['poly']
+      # points_on_border = ann['poly']
 
       if flipped:
         bbox[[0, 2]] = width - bbox[[2, 0]] - 1
-        for i in range(0, len(points_on_border), 2):
-          points_on_border[i] = width - points_on_border[i] - 1
-      for i in range(0, len(points_on_border), 2):
-        points_on_border[i], points_on_border[i + 1] = affine_transform([points_on_border[i], points_on_border[i + 1]],
-                                                                        trans_output)
-        points_on_border[i] = np.clip(points_on_border[i], 0, output_w - 1)
-        points_on_border[i + 1] = np.clip(points_on_border[i + 1], 0, output_h - 1)
+      #   for i in range(0, len(points_on_border), 2):
+      #     points_on_border[i] = width - points_on_border[i] - 1
+      # for i in range(0, len(points_on_border), 2):
+      #   points_on_border[i], points_on_border[i + 1] = affine_transform([points_on_border[i], points_on_border[i + 1]],
+      #                                                                   trans_output)
+      #   points_on_border[i] = np.clip(points_on_border[i], 0, output_w - 1)
+      #   points_on_border[i + 1] = np.clip(points_on_border[i + 1], 0, output_h - 1)
 
       bbox[:2] = affine_transform(bbox[:2], trans_output)
       bbox[2:] = affine_transform(bbox[2:], trans_output)
@@ -134,12 +134,12 @@ class CTDetDataset(data.Dataset):
         ct = np.array(
           [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2], dtype=np.float32)
 
-        mass_cx, mass_cy = 0, 0
-        for i in range(0, len(points_on_border), 2):
-          mass_cx += points_on_border[i]
-          mass_cy += points_on_border[i+1]
-        ct[0] = mass_cx / (len(points_on_border)/2)
-        ct[1] = mass_cy / (len(points_on_border)/2)
+        # mass_cx, mass_cy = 0, 0
+        # for i in range(0, len(points_on_border), 2):
+        #   mass_cx += points_on_border[i]
+        #   mass_cy += points_on_border[i+1]
+        # ct[0] = mass_cx / (len(points_on_border)/2)
+        # ct[1] = mass_cy / (len(points_on_border)/2)
 
         ct_int = ct.astype(np.int32)
 

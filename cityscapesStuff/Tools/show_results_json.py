@@ -8,16 +8,20 @@ import os
 import json
 import cv2
 
-TRESH = 0.3
-base_dir = '/store/datasets/cityscapes'
-# anno = json.load(open('../BBoxes/val.json', 'r'))
-anno = json.load(open('../BBoxes/test.json', 'r'))
+TRESH = 0.25
 
+base_dir = '/store/datasets/cityscapes'
+# anno = json.load(open('/store/datasets/UA-Detrac/COCO-format/test-1-on-200_b.json', 'r'))
+# anno = json.load(open('../BBoxes/val.json', 'r'))
+# anno = json.load(open('../BBoxes/test.json', 'r'))
+# anno = json.load(open('../../KITTIPolyStuff/BBoxes/test.json', 'r'))
+# anno = json.load(open('../../KITTIPolyStuff/BBoxes/trainval16.json', 'r'))
+anno = json.load(open('../../IDDStuff/BBoxes/test.json', 'r'))
 id_to_file = {}
 for image in anno['images']:
     id_to_file[image['id']] = image['file_name']
 
-results_file = '/usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/from_coco_ext_poly_ext_depth/results.json'
+results_file = '/usagers2/huper/dev/CenterPoly/exp/IDD/polydet/from_cityscapes/results.json'
 results = json.load(open(results_file, 'r'))
 image_to_boxes = {}
 for result in results:
@@ -60,7 +64,7 @@ for key in sorted(image_to_boxes):
             depth = float(poly[2])
             depths.append(depth)
             label = int(poly[1]) - 1
-            ec = ''
+            ec = (255, 255, 0, 100)
             if label == 0:
                 ec = (255, 255, 0, 100)  # person
             elif label == 1:
@@ -78,7 +82,6 @@ for key in sorted(image_to_boxes):
             elif label == 7:
                 ec = (220, 185, 237, 100)  # bicycle
 
-            lw = score * 2
             points = []
             for i in range(3, len(poly)-1, 2):
                 points.append((poly[i], poly[i+1]))
@@ -95,6 +98,8 @@ for key in sorted(image_to_boxes):
             # poly = patches.Polygon(points, linewidth=lw, edgecolor=ec, facecolor='none')
             # ax.add_patch(poly)
     # im.show()
+    if not os.path.exists(os.path.join(os.path.dirname(results_file), 'image_examples')):
+        os.mkdir(os.path.join(os.path.dirname(results_file), 'image_examples'))
     im.save(os.path.join(os.path.dirname(results_file), 'image_examples', os.path.basename(key)))
     heatmap = cv2.applyColorMap(np.array(depth_map).astype(np.uint8), cv2.COLORMAP_HOT)
     cv2.imwrite(os.path.join(os.path.dirname(results_file), 'image_examples', os.path.basename(key).replace('.png', '_depth.png')), heatmap)

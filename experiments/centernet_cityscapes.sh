@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source /store/dev/anaconda3/etc/profile.d/conda.sh
+conda activate centernet
 cd src
 
 # python main.py ctdet --val_intervals 2 --exp_id ctdet --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
@@ -13,4 +15,4 @@ cd src
 # python test.py ctdet --exp_id ctdet_hg --dataset cityscapes --arch hourglass --load_model ../exp/cityscapes/ctdet/ctdet_hg/model_best.pth
 
 # python main.py ctdet --val_intervals 2 --exp_id ctdet_cg --elliptical_gt --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
-python test.py --nms ctdet --exp_id ctdet_cg --dataset cityscapes --arch smallhourglass --load_model ../exp/cityscapes/ctdet/ctdet_cg/model_best.pth
+# python test.py --nms ctdet --exp_id ctdet_cg --dataset cityscapes --arch smallhourglass --load_model ../exp/cityscapes/ctdet/ctdet_cg/model_best.pth

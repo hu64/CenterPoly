@@ -13,7 +13,7 @@ class opts(object):
     self.parser.add_argument('task', default='ctdet',
                              help='ctdet | ddd | multi_pose | exdet | polydet')
     self.parser.add_argument('--dataset', default='uav',
-                             help='coco | kitti |kitti2d | coco_hp | pascal | uadetrac | uadetrac1on10 | uadetrac1on10_b| uav | cityscapes')
+                             help='coco | kitti |kitti2d | coco_hp | pascal | uadetrac | uadetrac1on10 | uadetrac1on10_b| uav | cityscapes | IDD')
     self.parser.add_argument('--exp_id', default='default')
     self.parser.add_argument('--test', action='store_true')
     self.parser.add_argument('--debug', type=int, default=0,

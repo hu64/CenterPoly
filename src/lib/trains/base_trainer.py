@@ -102,7 +102,7 @@ class BaseTrainer(object):
       if opt.debug > 0:
         self.debug(batch, output, iter_id)
       
-      if opt.test or (opt.dataset == 'cityscapes' and phase == 'val'):
+      if opt.test or (True and opt.dataset == 'cityscapes' and phase == 'val'):
         self.save_result(output, batch, results)
       del output, loss, loss_stats
     
