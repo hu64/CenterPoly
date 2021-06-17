@@ -34,5 +34,8 @@ cd src
 
 # DLA Stuff
 # python main.py polydet --val_intervals 24 --exp_id from_coco_dla --poly_weight 1 --elliptical_gt --nbr_points 16 --dataset cityscapes --arch dlav0_34  --batch_size 8 --master_batch 4 --lr 2e-4
-# python main.py polydet --val_intervals 24 --exp_id from_coco_dla --poly_weight 1 --elliptical_gt --nbr_points 16 --dataset cityscapes --arch dlav0_34  --batch_size 8 --master_batch 4 --lr 2e-4 --resume
+# python main.py polydet --test --eval_oracle_hm --eval_oracle_poly --eval_oracle_pseudo_depth --eval_oracle_offset --val_intervals 24 --exp_id from_coco_dla --poly_weight 1 --elliptical_gt --nbr_points 32 --dataset cityscapes --arch dlav0_34  --batch_size 8 --master_batch 4 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_dla/model_best.pth
 # python test.py --nms polydet --exp_id from_coco_dla --nbr_points 16 --dataset cityscapes --arch dlav0_34 --load_model ../exp/cityscapes/polydet/from_coco_dla/model_best.pth
+
+# python main.py polydet --val_intervals 10 --exp_id resnet101_32pts --poly_weight 1 --elliptical_gt --nbr_points 32 --dataset cityscapes --arch res_101  --batch_size 6 --lr 2e-4
+python main.py polydet --val_intervals 10 --exp_id resnet101_32pts --poly_weight 1 --elliptical_gt --nbr_points 32 --dataset cityscapes --arch res_101  --batch_size 6 --lr 2e-4 --resume

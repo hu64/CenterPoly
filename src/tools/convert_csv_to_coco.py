@@ -24,10 +24,10 @@ import cv2
 #            '../../cityscapesStuff/BBoxes/val32.json':
 #                open('../../cityscapesStuff/BBoxes/val32pts.csv', 'r').readlines(),
 #          }
-# io_dic = { '../../cityscapesStuff/BBoxes/train64_real_points.json':
-#             open('../../cityscapesStuff/BBoxes/train64_real_points.csv', 'r').readlines(),
-#            '../../cityscapesStuff/BBoxes/val64_real_points.json':
-#                open('../../cityscapesStuff/BBoxes/val64_real_points.csv', 'r').readlines(),
+# io_dic = { '../../cityscapesStuff/BBoxes/train256_real_points.json':
+#             open('../../cityscapesStuff/BBoxes/train256_real_points.csv', 'r').readlines(),
+#            '../../cityscapesStuff/BBoxes/val256_real_points.json':
+#                open('../../cityscapesStuff/BBoxes/val256_real_points.csv', 'r').readlines(),
 #          }
 # io_dic = { '../../cityscapesStuff/BBoxes/train32_real_points.json':
 #             open('../../cityscapesStuff/BBoxes/train32_real_points.csv', 'r').readlines(),
@@ -44,11 +44,11 @@ import cv2
 #            '../../cityscapesStuff/BBoxes/val8_regular_interval.json':
 #                open('../../cityscapesStuff/BBoxes/val8_regular_interval.csv', 'r').readlines(),
 #          }
-# io_dic = { '../../cityscapesStuff/BBoxes/train32_regular_interval.json':
-#             open('../../cityscapesStuff/BBoxes/train32_regular_interval.csv', 'r').readlines(),
-#            '../../cityscapesStuff/BBoxes/val32_regular_interval.json':
-#                open('../../cityscapesStuff/BBoxes/val32_regular_interval.csv', 'r').readlines(),
-#          }
+io_dic = { '../../cityscapesStuff/BBoxes/train64_regular_interval.json':
+            open('../../cityscapesStuff/BBoxes/train64_regular_interval.csv', 'r').readlines(),
+           '../../cityscapesStuff/BBoxes/val64_regular_interval.json':
+               open('../../cityscapesStuff/BBoxes/val64_regular_interval.csv', 'r').readlines(),
+         }
 # io_dic = { '../../cityscapesStuff/BBoxes/train16_regular_interval.json':
 #             open('../../cityscapesStuff/BBoxes/train16_regular_interval.csv', 'r').readlines(),
 #            '../../cityscapesStuff/BBoxes/val16_regular_interval.json':
@@ -70,14 +70,13 @@ import cv2
 #            '../../KITTIPolyStuff/BBoxes/trainval32.json':
 #                open('../../KITTIPolyStuff/BBoxes/trainval32.csv', 'r').readlines(),
 #          }
-io_dic = { '../../IDDStuff/BBoxes/train16_regular_interval.json':
-            open('../../IDDStuff/BBoxes/train16_regular_interval.csv', 'r').readlines(),
-           '../../IDDStuff/BBoxes/val16_regular_interval.json':
-               open('../../IDDStuff/BBoxes/val16_regular_interval.csv', 'r').readlines(),
-           '../../IDDStuff/BBoxes/test.json':
-               open('../../IDDStuff/BBoxes/test.csv', 'r').readlines(),
-         }
-
+# io_dic = { '../../IDDStuff/BBoxes/train16_regular_interval.json':
+#             open('../../IDDStuff/BBoxes/train16_regular_interval.csv', 'r').readlines(),
+#            '../../IDDStuff/BBoxes/val16_regular_interval.json':
+#                open('../../IDDStuff/BBoxes/val16_regular_interval.csv', 'r').readlines(),
+#            '../../IDDStuff/BBoxes/test.json':
+#                open('../../IDDStuff/BBoxes/test.csv', 'r').readlines(),
+#          }
 
 
 DEBUG = False
@@ -112,8 +111,8 @@ def _bbox_to_coco_bbox(bbox):
           (bbox[2] - bbox[0]), (bbox[3] - bbox[1])]
 
 # cats = ['bus', 'car', 'others', 'van']
-# cats = ['person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle']
-cats = ['person', 'rider', 'motorcycle', 'bicycle', 'autorickshaw', 'car', 'truck', 'bus', 'vehicle fallback']
+cats = ['person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle']
+# cats = ['person', 'rider', 'motorcycle', 'bicycle', 'autorickshaw', 'car', 'truck', 'bus', 'vehicle fallback']
 cat_ids = {cat: i + 1 for i, cat in enumerate(cats)}
 cat_info = []
 for i, cat in enumerate(cats):

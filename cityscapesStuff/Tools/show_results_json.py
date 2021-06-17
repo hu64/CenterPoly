@@ -7,21 +7,24 @@ import numpy as np
 import os
 import json
 import cv2
+from skimage.segmentation import active_contour
+from skimage.filters import gaussian
+
 
 TRESH = 0.25
 
 base_dir = '/store/datasets/cityscapes'
 # anno = json.load(open('/store/datasets/UA-Detrac/COCO-format/test-1-on-200_b.json', 'r'))
-# anno = json.load(open('../BBoxes/val.json', 'r'))
+anno = json.load(open('../BBoxes/val16_regular_interval.json', 'r'))
 # anno = json.load(open('../BBoxes/test.json', 'r'))
 # anno = json.load(open('../../KITTIPolyStuff/BBoxes/test.json', 'r'))
 # anno = json.load(open('../../KITTIPolyStuff/BBoxes/trainval16.json', 'r'))
-anno = json.load(open('../../IDDStuff/BBoxes/test.json', 'r'))
+# anno = json.load(open('../../IDDStuff/BBoxes/test.json', 'r'))
 id_to_file = {}
 for image in anno['images']:
     id_to_file[image['id']] = image['file_name']
 
-results_file = '/usagers2/huper/dev/CenterPoly/exp/IDD/polydet/from_cityscapes/results.json'
+results_file = '//usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/from_coco_dla/results.json'
 results = json.load(open(results_file, 'r'))
 image_to_boxes = {}
 for result in results:
@@ -85,6 +88,12 @@ for key in sorted(image_to_boxes):
             points = []
             for i in range(3, len(poly)-1, 2):
                 points.append((poly[i], poly[i+1]))
+
+            # init = np.array(points)
+            # img = np.array(im)
+            # snake = active_contour(gaussian(img, 3), init, alpha=0.015, beta=10, gamma=0.001)
+            # points = list(zip(snake[:, 0], snake[:, 1]))
+
             ImageDraw.Draw(im, 'RGBA').polygon(points, outline=0, fill=ec)
     for poly in sorted(image_to_boxes[key], key=lambda x: x[2], reverse=True):
         score = float(poly[0])

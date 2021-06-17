@@ -11,7 +11,7 @@ import torch.utils.data as data
 import glob
 from multiprocessing import Pool
 from pycocotools.cocoeval import COCOeval
-
+import cv2
 
 def write_mask_image(args):
     polygon, mask_path = args

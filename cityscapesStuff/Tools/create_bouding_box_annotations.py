@@ -7,9 +7,9 @@ import math
 import bresenham
 from PIL import Image, ImageDraw
 
-METHODS = ['regular_interval']  # , 'real_points'
+METHODS = ['regular_interval']  # ['real_points']  # , 'real_points'
 COARSE = False
-NBR_POINTSS = [8]  # 16, 32, 64
+NBR_POINTSS = [64]  # 16, 32, 64
 # from cityscapes scripts, thee labels have instances:
 have_instances = ['person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle']
 
@@ -120,6 +120,7 @@ for method in METHODS:
                         items = [os.path.abspath(filename), x0, y0, x1, y1, label, count]
 
                         if method == 'real_points':
+
                             while len(object['polygon']) > NBR_POINTS:
                                 distances = []
                                 for i in range(1, len(object['polygon'])):
