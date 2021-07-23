@@ -16,3 +16,8 @@ cd src
 
 # python main.py ctdet --val_intervals 2 --exp_id ctdet_cg --elliptical_gt --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
 # python test.py --nms ctdet --exp_id ctdet_cg --dataset cityscapes --arch smallhourglass --load_model ../exp/cityscapes/ctdet/ctdet_cg/model_best.pth
+
+
+# RESDNC
+python main.py ctdet --val_intervals 6 --exp_id from_coco_resnetdcn101_freq --elliptical_gt --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../models/ctdet_coco_resdcn101.pth
+# python test.py ctdet --test --exp_id from_coco_resnetdcn101 --dataset cityscapes --arch resdcn_101 --keep_res --load_model ../exp/cityscapes/ctdet/from_coco_resnetdcn101/model_last.pth

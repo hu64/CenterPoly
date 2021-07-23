@@ -7,11 +7,12 @@ import math
 import bresenham
 from PIL import Image, ImageDraw
 
-METHODS = ['regular_interval']  # ['real_points']  # , 'real_points'
+METHODS = ['grid_based']  #   # , 'real_points'
 COARSE = False
-NBR_POINTSS = [64]  # 16, 32, 64
+NBR_POINTSS = [24, 32, 40] # 16, 32, 64
 # from cityscapes scripts, thee labels have instances:
-have_instances = ['person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle']
+have_instances = ['person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle', 'pole', 'traffic sign', 'traffic light']
+instance_frequencies = {'person':0, 'rider':0, 'car':0, 'truck':0, 'bus':0, 'train':0, 'motorcycle':0, 'bicycle':0, 'pole':0, 'traffic sign':0, 'traffic light':0}
 
 
 def find_first_non_zero_pixel(points, instance_image):
@@ -46,6 +47,34 @@ def find_points_from_box(box, n_points):
     points.append((x0, round(y1 - i * y_interval)))
   return points
 
+
+def find_grid_lines_from_box(box, n_points):
+  assert n_points % 2 == 0, "n_points should be a multiple of four"  # simpler this way
+  x0, y0, x1, y1 = box
+  x0 += 1
+  x1 -= 1
+  nbr_points = int(n_points/2)
+  x_interval = (x1 - x0) / (nbr_points-1)
+  y_interval = (y1 - y0) / (nbr_points-1)
+  points = []
+  for i in range(nbr_points):
+    points.append(((round(x0 + (i) * x_interval), y0), (round(x0 + (i) * x_interval), y1)))
+  # for i in range(nbr_points):
+  #   points.append(((x1, round(y0 + (i+1) * y_interval)), ((x0, round(y0 + (i+1) * y_interval)))))
+  for i in reversed(range(nbr_points)):
+    points.append((((round(x0 + (i) * x_interval), y1), (round(x0 + (i) * x_interval), y0))))
+  # for i in reversed(range(nbr_points)):
+  #   points.append((((x0, round(y0 + (i + 1) * y_interval)), (x1, round(y0 + (i + 1) * y_interval)))))
+
+  return points
+
+
+def find_grid_lines_from_side(side, n_points):
+    x0, x1 = side
+    interval = abs(x0 - x1) / (nbr_points+1)
+    lines = []
+    for i in range(n_points):
+        points.append(((round(x0 + (i + 1) * x_interval), y0), (round(x0 + (i + 1) * x_interval), y1)))
 
 def get_angle(a, b, c):
     ang = math.degrees(math.atan2(c[1]-b[1], c[0]-b[0]) - math.atan2(a[1]-b[1], a[0]-b[0]))
@@ -92,7 +121,7 @@ max_point_per_polygon = 0
 if COARSE:
     sets = 'train', 'val'
 else:
-    sets = 'train', 'val'  # , 'test'
+    sets = ['val', 'train']  #, 'train  # , 'test'
 
 for method in METHODS:
     for NBR_POINTS in NBR_POINTSS:
@@ -116,10 +145,11 @@ for method in METHODS:
                 for object in objects:
                     label = object['label']
                     if label in have_instances:
+                        instance_frequencies[label] += 1
                         bbox = x0, y0, x1, y1 = polygon_to_box(object['polygon'])
                         items = [os.path.abspath(filename), x0, y0, x1, y1, label, count]
 
-                        if method == 'real_points':
+                        if 'real_points' in method:
 
                             while len(object['polygon']) > NBR_POINTS:
                                 distances = []
@@ -137,8 +167,18 @@ for method in METHODS:
                                 object['polygon'].insert(max_index+1, new_point)
 
                             object['polygon'] = rotate_points(object['polygon'], bbox)
-
-                        elif method == 'regular_interval':
+                        elif 'grid_based' in method:
+                            poly_img = Image.new('L', (2048, 1024), 0)
+                            ImageDraw.Draw(poly_img).polygon([tuple(item) for item in object['polygon']], outline=0, fill=255)
+                            poly_img = np.array(poly_img)
+                            lines = find_grid_lines_from_box(box=bbox, n_points=NBR_POINTS)
+                            points_on_border = []
+                            for line in lines:
+                                ((x0, y0), (x1, y1)) = line
+                                points = bresenham.bresenham(x0, y0, x1, y1)
+                                points_on_border.append(find_first_non_zero_pixel(points, poly_img))
+                            object['polygon'] = points_on_border
+                        elif 'regular_interval' in method:
                             poly_img = Image.new('L', (2048, 1024), 0)
                             ImageDraw.Draw(poly_img).polygon([tuple(item) for item in object['polygon']], outline=0, fill=255)
                             poly_img = np.array(poly_img)
@@ -176,3 +216,4 @@ for method in METHODS:
 
         print('max objects: ', max_objects_per_img)
         print('max nbr points: ', max_point_per_polygon)
+print(instance_frequencies)

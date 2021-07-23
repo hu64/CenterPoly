@@ -22,8 +22,8 @@ for data_set in sets:
             label = object['label']
             if label in have_instances:
                 polygon = [tuple(item) for item in object['polygon']]
-                ImageDraw.Draw(polygon_mask).polygon(polygon, outline=0, fill=255)
-        polygon_path = filename.replace('gtFine', 'polygons').replace('json', 'png').replace('_polygons', '')
+                ImageDraw.Draw(polygon_mask).polygon(polygon, outline=255, fill=255)
+        polygon_path = filename.replace('gtFine', 'fg').replace('json', 'png').replace('_fg', '')
         if not os.path.exists((os.path.dirname(polygon_path))):
             os.mkdir(os.path.dirname(polygon_path))
         cv2.imwrite(polygon_path, np.array(polygon_mask))

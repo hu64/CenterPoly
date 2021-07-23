@@ -34,25 +34,26 @@ import cv2
 #            '../../cityscapesStuff/BBoxes/val32_real_points.json':
 #                open('../../cityscapesStuff/BBoxes/val32_real_points.csv', 'r').readlines(),
 #          }
-# io_dic = { '../../cityscapesStuff/BBoxes/train16_real_points.json':
-#             open('../../cityscapesStuff/BBoxes/train16_real_points.csv', 'r').readlines(),
-#            '../../cityscapesStuff/BBoxes/val16_real_points.json':
-#                open('../../cityscapesStuff/BBoxes/val16_real_points.csv', 'r').readlines(),
+# io_dic = {
+#             '../../cityscapesStuff/BBoxes/train40_grid_based.json':
+#             open('../../cityscapesStuff/BBoxes/train40_grid_based.csv', 'r').readlines(),
+#             '../../cityscapesStuff/BBoxes/val40_grid_based.json':
+#             open('../../cityscapesStuff/BBoxes/val40_grid_based.csv', 'r').readlines(),
 #          }
 # io_dic = { '../../cityscapesStuff/BBoxes/train8_regular_interval.json':
 #             open('../../cityscapesStuff/BBoxes/train8_regular_interval.csv', 'r').readlines(),
 #            '../../cityscapesStuff/BBoxes/val8_regular_interval.json':
 #                open('../../cityscapesStuff/BBoxes/val8_regular_interval.csv', 'r').readlines(),
 #          }
-io_dic = { '../../cityscapesStuff/BBoxes/train64_regular_interval.json':
-            open('../../cityscapesStuff/BBoxes/train64_regular_interval.csv', 'r').readlines(),
-           '../../cityscapesStuff/BBoxes/val64_regular_interval.json':
-               open('../../cityscapesStuff/BBoxes/val64_regular_interval.csv', 'r').readlines(),
+io_dic = { '../../cityscapesStuff/BBoxes/train24_regular_interval.json':
+            open('../../cityscapesStuff/BBoxes/train24_regular_interval_fg3.csv', 'r').readlines(),
+           '../../cityscapesStuff/BBoxes/val24_regular_interval.json':
+               open('../../cityscapesStuff/BBoxes/val24_regular_interval_fg3.csv', 'r').readlines(),
          }
-# io_dic = { '../../cityscapesStuff/BBoxes/train16_regular_interval.json':
-#             open('../../cityscapesStuff/BBoxes/train16_regular_interval.csv', 'r').readlines(),
-#            '../../cityscapesStuff/BBoxes/val16_regular_interval.json':
-#                open('../../cityscapesStuff/BBoxes/val16_regular_interval.csv', 'r').readlines(),
+# io_dic = { '../../cityscapesStuff/BBoxes/train16_regular_interval_fg3.json':
+#             open('../../cityscapesStuff/BBoxes/train16_regular_interval_fg3.csv', 'r').readlines(),
+#            '../../cityscapesStuff/BBoxes/val16_regular_interval_fg3.json':
+#                open('../../cityscapesStuff/BBoxes/val16_regular_interval_fg3.csv', 'r').readlines(),
 #          }
 # io_dic = { '../../KITTIPolyStuff/BBoxes/train16.json':
 #             open('../../KITTIPolyStuff/BBoxes/train16.csv', 'r').readlines(),
@@ -111,7 +112,7 @@ def _bbox_to_coco_bbox(bbox):
           (bbox[2] - bbox[0]), (bbox[3] - bbox[1])]
 
 # cats = ['bus', 'car', 'others', 'van']
-cats = ['person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle']
+cats = ['person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle'] # , 'pole', 'traffic sign', 'traffic light']
 # cats = ['person', 'rider', 'motorcycle', 'bicycle', 'autorickshaw', 'car', 'truck', 'bus', 'vehicle fallback']
 cat_ids = {cat: i + 1 for i, cat in enumerate(cats)}
 cat_info = []
@@ -130,7 +131,6 @@ for outputfile in io_dic:
             image_index = int(os.path.basename(items[0].replace('.jpg', '').replace('img', '')))
             if image_index % 10 != 0:
                 continue
-        BINARY = '_b' in outputfile
         if items[0] in image_to_boxes:
             image_to_boxes[items[0]].append(items[1:])
         else:
@@ -146,13 +146,11 @@ for outputfile in io_dic:
         for ann_ind, box in enumerate(image_to_boxes[path]):
             x0, y0, x1, y1, label, pseudo_depth = int(float(box[0])), int(float(box[1])), int(float(box[2])), int(float(box[3])), box[4], int(box[5])
             poly_points = [float(item) for item in box[6:]]
-            if label.strip() == 'no_object':
+            if label.strip() == 'no_object' or label.strip() not in cat_ids:
                 continue
 
-            if not BINARY:
-                cat_id = cat_ids[label.strip()]
-            else:
-                cat_id = 1
+            cat_id = cat_ids[label.strip()]
+
             truncated = 0
             occluded = 0
             bbox = [float(x0), float(y0), float(x1), float(y1)]

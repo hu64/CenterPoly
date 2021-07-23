@@ -86,7 +86,7 @@ class BaseDetector(object):
   def process(self, images, return_time=False):
     raise NotImplementedError
 
-  def post_process(self, dets, meta, scale=1):
+  def post_process(self, dets, meta, scale=1, fg=None):
     raise NotImplementedError
 
   def merge_outputs(self, detections):
@@ -141,7 +141,11 @@ class BaseDetector(object):
       if self.opt.debug >= 2:
         self.debug(debugger, images, dets, output, scale)
 
-      dets = self.post_process(dets, meta, scale)
+      if False and 'fg' in output:
+        dets, fg = self.post_process(dets, meta, scale, fg=output['fg'])
+      else:
+        dets = self.post_process(dets, meta, scale)
+
       torch.cuda.synchronize()
       post_process_time = time.time()
       post_time += post_process_time - decode_time
@@ -155,6 +159,7 @@ class BaseDetector(object):
 
     if self.opt.debug >= 1:
       self.show_results(debugger, image, results)
+
     return {'results': results, 'tot': tot_time, 'load': load_time,
             'pre': pre_time, 'net': net_time, 'dec': dec_time,
             'post': post_time, 'merge': merge_time}

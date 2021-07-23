@@ -9,22 +9,25 @@ import json
 import cv2
 from skimage.segmentation import active_contour
 from skimage.filters import gaussian
+import bresenham
+import shapely
+from shapely.geometry import Polygon
 
-
-TRESH = 0.25
+TRESH = 0.5
 
 base_dir = '/store/datasets/cityscapes'
 # anno = json.load(open('/store/datasets/UA-Detrac/COCO-format/test-1-on-200_b.json', 'r'))
-anno = json.load(open('../BBoxes/val16_regular_interval.json', 'r'))
+# anno = json.load(open('../BBoxes/val16_regular_interval.json', 'r'))
 # anno = json.load(open('../BBoxes/test.json', 'r'))
-# anno = json.load(open('../../KITTIPolyStuff/BBoxes/test.json', 'r'))
+anno = json.load(open('../../KITTIPolyStuff/BBoxes/test.json', 'r'))
 # anno = json.load(open('../../KITTIPolyStuff/BBoxes/trainval16.json', 'r'))
 # anno = json.load(open('../../IDDStuff/BBoxes/test.json', 'r'))
 id_to_file = {}
 for image in anno['images']:
     id_to_file[image['id']] = image['file_name']
 
-results_file = '//usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/from_coco_dla/results.json'
+# results_file = '/usagers2/huper/dev/CenterPoly/exp/cityscapes/polydet/from_ctdet_smhg_1cnv_16_pw1_B_TEST/results.json'
+results_file = '/usagers2/huper/dev/CenterPoly/exp/kitti_poly/polydet/cityscapes_model/results.json'
 results = json.load(open(results_file, 'r'))
 image_to_boxes = {}
 for result in results:
@@ -84,17 +87,31 @@ for key in sorted(image_to_boxes):
                 ec = (255, 0, 170, 100)  # motorcycle
             elif label == 7:
                 ec = (220, 185, 237, 100)  # bicycle
-
+            elif label == 8:
+                ec = (0, 0, 0, 100)  # pole
+            elif label == 9:
+                ec = (0, 0, 0, 100)  # traffic sign
             points = []
             for i in range(3, len(poly)-1, 2):
                 points.append((poly[i], poly[i+1]))
-
-            # init = np.array(points)
-            # img = np.array(im)
-            # snake = active_contour(gaussian(img, 3), init, alpha=0.015, beta=10, gamma=0.001)
-            # points = list(zip(snake[:, 0], snake[:, 1]))
+            # x, y = points[0::2], points[1::2]
+            # try:
+            #     polygon = Polygon((points))
+            #     polygon = polygon.buffer(10, join_style=1).buffer(-10.0, join_style=1)
+            #     x, y = polygon.exterior.coords.xy
+            #     points = [(int(item[0]), int(item[1])) for item in zip(x, y)]
+            # except:
+            #     do_nothing = True
 
             ImageDraw.Draw(im, 'RGBA').polygon(points, outline=0, fill=ec)
+            # contour = list(bresenham.bresenham(points[-1][0], points[-1][1], points[0][0], points[0][1]))
+            # for i in range(len(points)-1):
+            #     line = bresenham.bresenham(points[i][0], points[i][1], points[i+1][0], points[i+1][1])
+            #     contour += line
+            # for point in set(contour):
+            #     ImageDraw.Draw(im, 'RGBA').ellipse([(point[0]-5, point[1]-5), (point[0]+5, point[1]+5)], outline=0, fill=ec)
+
+            # ImageDraw.Draw(im, 'RGBA').line(points[0:2], fill=(0, 0, 0), width=2)
     for poly in sorted(image_to_boxes[key], key=lambda x: x[2], reverse=True):
         score = float(poly[0])
         depth = float(poly[2])
@@ -104,6 +121,7 @@ for key in sorted(image_to_boxes):
                 points.append((poly[i], poly[i + 1]))
             depth_color = (((depth-np.min(depths)) / np.max(depths))) * 255
             ImageDraw.Draw(depth_map).polygon(points, outline=0, fill=depth_color)
+
             # poly = patches.Polygon(points, linewidth=lw, edgecolor=ec, facecolor='none')
             # ax.add_patch(poly)
     # im.show()

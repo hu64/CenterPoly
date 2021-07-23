@@ -14,7 +14,8 @@ import torch.utils.data as data
 
 class KITTIPOLY(data.Dataset):
     num_classes = 8
-    default_resolution = [384, 1280]
+    # default_resolution = [384, 1280]
+    default_resolution = [512, 1024]
     mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
     std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
 
@@ -28,8 +29,8 @@ class KITTIPOLY(data.Dataset):
         base_dir = '../KITTIPolyStuff/BBoxes'
 
         if split == 'test':
-            # self.annot_path = os.path.join(base_dir, 'test.json')
-            self.annot_path = os.path.join(base_dir, 'trainval16.json')
+            self.annot_path = os.path.join(base_dir, 'test.json')
+            # self.annot_path = os.path.join(base_dir, 'trainval16.json')
         elif split == 'val':
             self.annot_path = os.path.join(base_dir, 'val' + str(self.opt.nbr_points) + '.json')
         else:

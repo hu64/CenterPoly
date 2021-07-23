@@ -157,10 +157,14 @@ class CTDetDataset(data.Dataset):
         reg_mask[k] = 1
         cat_spec_wh[k, cls_id * 2: cls_id * 2 + 2] = wh[k]
         cat_spec_mask[k, cls_id * 2: cls_id * 2 + 2] = 1
+
         if self.opt.dense_wh:
           draw_dense_reg(dense_wh, hm.max(axis=0), ct_int, wh[k], radius)
+
         gt_det.append([ct[0] - w / 2, ct[1] - h / 2,
                        ct[0] + w / 2, ct[1] + h / 2, 1, cls_id])
+
+
 
     # for channel in range(hm.shape[0]):
     #   write_hm = cv2.resize(((hm[channel, :, :] - np.min(hm[channel, :, :]) / np.max(hm[channel, :, :])) * 255).astype(np.uint8), (896, 512))

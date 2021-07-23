@@ -15,6 +15,8 @@ from models.decode import polydet_decode
 from models.utils import flip_tensor
 from utils.post_process import polydet_post_process
 from .base_detector import BaseDetector
+import cv2
+from utils.image import get_affine_transform, affine_transform
 
 class PolydetDetector(BaseDetector):
   def __init__(self, opt):
@@ -24,6 +26,8 @@ class PolydetDetector(BaseDetector):
     with torch.no_grad():
       output = self.model(images)[-1]
       hm = output['hm'].sigmoid_()
+      # fg = output['fg'].sigmoid_()
+      # border_hm = output['border_hm'].sigmoid_()
       polys = output['poly']
       pseudo_depth = output['pseudo_depth']
       reg = output['reg'] if self.opt.reg_offset else None
@@ -38,13 +42,16 @@ class PolydetDetector(BaseDetector):
     else:
       return output, dets
 
-  def post_process(self, dets, meta, scale=1):
+  def post_process(self, dets, meta, scale=1, fg=None):
     dets = dets.detach().cpu().numpy()
     dets = dets.reshape(1, -1, dets.shape[2])
     dets = polydet_post_process(
         dets.copy(), [meta['c']], [meta['s']],
         meta['out_height'], meta['out_width'], self.opt.num_classes)
-    length = len(dets[0][1][0])
+    # trans_input = get_affine_transform(meta['c'], meta['s'], 0, [meta['out_width'], meta['out_height']])
+    # fg = cv2.warpAffine(fg, trans_input, (meta['out_width'], meta['out_height']), flags=cv2.INTER_LINEAR)
+
+    length = 38  # len(dets[0][1][0])
     for j in range(1, self.num_classes + 1):
       dets[0][j] = np.array(dets[0][j], dtype=np.float32).reshape(-1, length)
       dets[0][j][:, :4] /= scale

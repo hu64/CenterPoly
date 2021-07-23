@@ -161,13 +161,15 @@ class opts(object):
                              help='regression loss: sl1 | l1 | l2')
     self.parser.add_argument('--hm_weight', type=float, default=1,
                              help='loss weight for keypoint heatmaps.')
+    self.parser.add_argument('--border_hm_weight', type=float, default=1,
+                             help='loss weight for keypoint heatmaps.')
     self.parser.add_argument('--seg_weight', type=float, default=1,
                              help='loss weight for seg map.')
     self.parser.add_argument('--off_weight', type=float, default=1,
                              help='loss weight for keypoint local offsets.')
     self.parser.add_argument('--wh_weight', type=float, default=0.1,
                              help='loss weight for bounding box size.')
-    self.parser.add_argument('--poly_weight', type=float, default=0.1,
+    self.parser.add_argument('--poly_weight', type=float, default=1,
                              help='loss weight for polygons points.')
     self.parser.add_argument('--depth_weight', type=float, default=0.1,
                              help='loss weight for pseudo depth.')
@@ -192,6 +194,9 @@ class opts(object):
     self.parser.add_argument('--norm_wh', action='store_true',
                              help='L1(\hat(y) / y, 1) or L1(\hat(y), y)')
     self.parser.add_argument('--dense_wh', action='store_true',
+                             help='apply weighted regression near center or '
+                                  'just apply regression on center point.')
+    self.parser.add_argument('--dense_poly', action='store_true',
                              help='apply weighted regression near center or '
                                   'just apply regression on center point.')
     self.parser.add_argument('--cat_spec_wh', action='store_true',
@@ -224,6 +229,10 @@ class opts(object):
 
     # ground truth validation
     self.parser.add_argument('--eval_oracle_hm', action='store_true',
+                             help='use ground center heatmap.')
+    self.parser.add_argument('--eval_oracle_fg', action='store_true',
+                             help='use ground foreground.')
+    self.parser.add_argument('--eval_oracle_border_hm', action='store_true',
                              help='use ground center heatmap.')
     self.parser.add_argument('--eval_oracle_wh', action='store_true',
                              help='use ground truth bounding box size.')
@@ -358,7 +367,11 @@ class opts(object):
     elif opt.task == 'polydet':
       opt.heads = {'hm': opt.num_classes,
                    'poly': opt.nbr_points*2 if not opt.cat_spec_poly else opt.nbr_points*2 * opt.num_classes,
-                   'pseudo_depth': 1}
+                   'pseudo_depth': 1,
+                   # 'fg': 1,
+                   # 'wh': 2 ,
+                   #'border_hm': 1,
+                   }
       if opt.reg_offset:
         opt.heads.update({'reg': 2})
     elif opt.task == 'ctdetVid':
@@ -394,7 +407,7 @@ class opts(object):
          'ctdet': {'default_resolution': [512, 512], 'num_classes': 4,
                    'mean': [0.408, 0.447, 0.470], 'std': [0.289, 0.274, 0.278],
                    'dataset': 'uadetrac1on10'},
-        'polydet': {'default_resolution': [512, 1024], 'num_classes': 8,
+        'polydet': {'default_resolution': [512, 1024], 'num_classes': 11,
                           'mean': [0.284, 0.323, 0.282], 'std': [0.04, 0.04, 0.04],
                           'dataset': 'cityscapes'},
         'ctdetMultiSpot': {'default_resolution': [1024, 2048], 'num_classes': 1,

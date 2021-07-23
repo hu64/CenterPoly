@@ -12,6 +12,11 @@ import glob
 from multiprocessing import Pool
 from pycocotools.cocoeval import COCOeval
 import cv2
+import bresenham
+from shapely.geometry import Polygon
+
+FG = False
+
 
 def write_mask_image(args):
     polygon, mask_path = args
@@ -24,7 +29,10 @@ def write_mask_image(args):
 
 
 class CITYSCAPES(data.Dataset):
-    num_classes = 8
+    if FG:
+        num_classes = 8
+    else:
+        num_classes = 8
     # default_resolution = [1024, 2048]
     default_resolution = [512, 1024]
     # default_resolution = [512, 512]
@@ -44,17 +52,30 @@ class CITYSCAPES(data.Dataset):
         if split == 'test':
             self.annot_path = os.path.join(base_dir, 'test.json')
         elif split == 'val':
-            self.annot_path = os.path.join(base_dir, 'val' + str(self.opt.nbr_points) + '_regular_interval.json')
-            # self.annot_path = os.path.join(base_dir, 'val' + str(self.opt.nbr_points) + '_real_points.json')
+            # self.annot_path = os.path.join(base_dir, 'val' + str(self.opt.nbr_points) + '_grid_based.json')
+            if FG:
+                self.annot_path = os.path.join(base_dir, 'val' + str(self.opt.nbr_points) + '_regular_interval_fg3.json')
+            else:
+                self.annot_path = os.path.join(base_dir, 'val' + str(self.opt.nbr_points) + '_regular_interval.json')
+            # self.annot_path = os.path.join(base_dir, 'val' + str(self.opt.nbr_points) + '_real_points_fg3.json')
         else:
-            self.annot_path = os.path.join(base_dir, 'train' + str(self.opt.nbr_points) + '_regular_interval.json')
-            # self.annot_path = os.path.join(base_dir, 'train' + str(self.opt.nbr_points) + '_real_points.json')
+            # self.annot_path = os.path.join(base_dir, 'train' + str(self.opt.nbr_points) + '_grid_based.json')
+            if FG:
+                self.annot_path = os.path.join(base_dir, 'train' + str(self.opt.nbr_points) + '_regular_interval_fg3.json')
+            else:
+                self.annot_path = os.path.join(base_dir, 'train' + str(self.opt.nbr_points) + '_regular_interval.json')
+            # self.annot_path = os.path.join(base_dir, 'train' + str(self.opt.nbr_points) + '_real_points_fg3.json')
 
         self.max_objs = 128
         self.class_name = [
-            '__background__', 'person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle']
-        self.label_to_id = {'person':24, 'rider':25, 'car':26, 'truck':27, 'bus':28, 'train':31, 'motorcycle':32, 'bicycle':33}
-        self._valid_ids = [1, 2, 3, 4, 5, 6, 7, 8]
+            '__background__', 'person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle', 'pole', 'traffic sign', 'traffic light']
+        self.label_to_id = {'person':24, 'rider':25, 'car':26, 'truck':27, 'bus':28, 'train':31, 'motorcycle':32, 'bicycle':33, 'pole':-1, 'traffic sign':-1, 'traffic light':-1}
+        # self.class_frequencies = {'person': 0.15, 'rider': 0.03, 'car': 0.20, 'truck': 0.03, 'bus': 0.03, 'train': 0.03, 'motorcycle': 0.03, 'bicycle': 0.03, 'pole': 0.3, 'traffic sign': 0.15, 'traffic light': 0.03}
+        self.class_frequencies = {'person': 0.14062428170827013, 'rider': 0.015518384984665498, 'car': 0.20898266905714155, 'truck': 0.003822132907776267, 'bus': 0.0031719762791339126, 'train': 0.0012740443025920892, 'motorcycle': 0.005831707941761728, 'bicycle': 0.0322057384531526, 'pole': 0.34640870553158515, 'traffic sign': 0.16402335310072175, 'traffic light': 0.07813700573319936}
+        if FG:
+            self._valid_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        else:
+            self._valid_ids = [1, 2, 3, 4, 5, 6, 7, 8]
         self.cat_ids = {v: i for i, v in enumerate(self._valid_ids)}
         self.voc_color = [(v // 32 * 64 + 64, (v // 8) % 4 * 64, v % 8 * 32) \
                           for v in range(1, self.num_classes + 1)]
@@ -110,6 +131,8 @@ class CITYSCAPES(data.Dataset):
         detections = []
         for image_id in all_bboxes:
             for cls_ind in all_bboxes[image_id]:
+                if cls_ind == 'fg':
+                    continue
                 category_id = self._valid_ids[cls_ind - 1]
                 for bbox in all_bboxes[image_id][cls_ind]:
                     score = bbox[4]
@@ -136,41 +159,82 @@ class CITYSCAPES(data.Dataset):
         masks_dir = os.path.join(save_dir, 'masks')
         if not os.path.exists(masks_dir):
             os.mkdir(masks_dir)
+        # fg_dir = os.path.join(save_dir, 'fg')
+        # if not os.path.exists(fg_dir):
+        #     os.mkdir(fg_dir)
 
         for image_id in all_bboxes:
             image_name = id_to_file[int(image_id)]
             text_file = open(os.path.join(save_dir, os.path.basename(image_name).replace('.png', '.txt')), 'w')
             count = 0
+            ones = np.ones((1024, 2048))
+            to_remove_mask = np.zeros((1024, 2048))
+            param_list = []
+            # fg_path = os.path.join(fg_dir, os.path.basename(image_name))
+            # fg = all_bboxes[image_id]['fg']
+            # fg = np.array(cv2.resize(fg, (2048, 1024)))
+            # thresh = 0.5
+            # fg[fg >= thresh] = 1
+            # fg[fg < thresh] = 0
+            # fg = fg.astype(np.uint8)
+            # cv2.imwrite(fg_path, fg*255)
             for cls_ind in all_bboxes[image_id]:
-                param_list = []
-                to_remove_mask = Image.new('L', (2048, 1024), 1)
+                if cls_ind == 'fg':
+                    continue
                 for bbox in all_bboxes[image_id][cls_ind]:
                     if bbox[4] > 0.05:
-                        score = str(bbox[4])
                         depth = bbox[-1]
                         label = self.class_name[cls_ind]
                         polygon = list(map(self._to_float, bbox[5:-1]))
-                        # poly_points = []
-                        # for i in range(0, len(polygon)-1, 2):
-                        #     poly_points.append((int(polygon[i]), int(polygon[i+1])))
-                        # polygon_mask = Image.new('L', (2048, 1024), 0)
-                        # ImageDraw.Draw(polygon_mask).polygon(poly_points, outline=0, fill=255)
-                        mask_path = os.path.join(masks_dir, os.path.basename(image_name).replace('.png', '_' + str(count) + '.png'))
-                        # polygon_mask.save(mask_path)
-                        text_file.write('masks/' + os.path.basename(mask_path) + ' ' + str(self.label_to_id[label]) + ' ' + score + '\n')
-                        count += 1
-                        param_list.append((polygon, mask_path, bbox[4], depth))
+                        polygon = [(int(x), int(y)) for x, y in zip(polygon[0::2], polygon[1::2])]
+                        # if label != 'pole' and label != 'traffic sign' and label != 'traffic light':
+                        #     mask_path = os.path.join(masks_dir, os.path.basename(image_name).replace('.png', '_' + str(count) + '.png'))
+                        #     text_file.write('masks/' + os.path.basename(mask_path) + ' ' + str(self.label_to_id[label]) + ' ' + str(bbox[4]) + '\n')
+                        #     count += 1
+                        param_list.append((polygon, bbox[4], label, depth))
 
-                for args in sorted(param_list, key=lambda x: x[-1]):
-                    polygon, mask_path, score, depth = args
-                    poly_points = []
-                    for i in range(0, len(polygon), 2):
-                        poly_points.append((int(polygon[i]), int(polygon[i + 1])))
-                    polygon_mask = Image.new('L', (2048, 1024), 0)
-                    ImageDraw.Draw(polygon_mask).polygon(poly_points, outline=0, fill=255)
-                    polygon_mask = Image.fromarray(np.array(polygon_mask) * np.array(to_remove_mask))
-                    if score >= 0.5:
-                        ImageDraw.Draw(to_remove_mask).polygon(poly_points, outline=0, fill=0)
+            for args in sorted(param_list, key=lambda x: x[-1]):
+                points, score, label, depth = args
+                polygon_mask = Image.new('L', (2048, 1024), 0)
+                if label != 'pole' and label != 'traffic sign' and label != 'traffic light':
+
+                    # round edges
+                    # try:
+                    #     polygon = Polygon((points))
+                    #     polygon = polygon.buffer(10, join_style=1).buffer(-10.0, join_style=1)
+                    #     x, y = polygon.exterior.coords.xy
+                    #     points = [(int(item[0]), int(item[1])) for item in zip(x, y)]
+                    # except:
+                    #     do_nothing = True
+
+                    ImageDraw.Draw(polygon_mask).polygon(points, outline=255, fill=255)
+
+                    # Draw contour
+                    contour = list(bresenham.bresenham(points[-1][0], points[-1][1], points[0][0], points[0][1]))
+                    for i in range(len(points) - 1):
+                        line = bresenham.bresenham(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1])
+                        contour += line
+                    radius = 2
+                    for point in set(contour):
+                        ImageDraw.Draw(polygon_mask).ellipse([(point[0] - radius, point[1] - radius),
+                                                              (point[0] + radius, point[1] + radius)],
+                                                               outline=255, fill=255)
+
+                    # polygon_mask = Image.fromarray(np.array(polygon_mask) * np.array(fg))
+                    polygon_mask = Image.fromarray(np.array(polygon_mask) * (ones - to_remove_mask).astype(np.uint8))
+
+                if score >= 0.5:
+                    to_remove_mask += np.array(polygon_mask)
+                    to_remove_mask[to_remove_mask > 0] = 1
+                    # ImageDraw.Draw(to_remove_mask).polygon(points, outline=0, fill=0)
+                if label != 'pole' and label != 'traffic sign' and label != 'traffic light' and \
+                        np.count_nonzero(polygon_mask) > 100:
+
+                    mask_path = os.path.join(masks_dir, os.path.basename(image_name).replace('.png', '_' + str(count)
+                                                                                             + '.png'))
+                    text_file.write('masks/' + os.path.basename(mask_path) + ' ' + str(self.label_to_id[label])
+                                    + ' ' + str(min(1, score*1.2)) + '\n')
+                    count += 1
                     polygon_mask.save(mask_path)
         # with Pool(processes=4) as pool:
         #     pool.map(write_mask_image, param_list)

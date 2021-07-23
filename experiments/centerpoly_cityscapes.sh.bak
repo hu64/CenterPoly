@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+
+source /store/dev/anaconda3/etc/profile.d/conda.sh
+conda activate centernet
+cd src
+
+# python main.py polydet --val_intervals 12 --exp_id from101_res34_nofg --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_34  --batch_size 20 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_16_resnetdcn101_l1_no_fg/model_best.pth
+# python main.py polydet --val_intervals 12 --exp_id from101_res34_nofg --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_34  --batch_size 20 --lr 2e-4 --resume
+
+# python test.py --nms polydet --exp_id from_coco_16_resnetdcn101_l1_no_fg_TEST --nbr_points 16 --dataset cityscapes --arch resdcn_101 --load_model ../exp/cityscapes/polydet/from_coco_16_resnetdcn101_l1_no_fg/model_best.pth
+# python test.py polydet --exp_id from101_res34_nofg --nbr_points 16 --dataset cityscapes --arch resdcn_34 --load_model ../exp/cityscapes/polydet/from101_res34_nofg/model_best.pth
+# python test.py polydet --exp_id fromct_res18_nofg --nbr_points 16 --dataset cityscapes --arch resdcn_18 --load_model ../exp/cityscapes/polydet/fromct_res18_nofg/model_best.pth
+python test.py --nms polydet --exp_id from101_res50_nofg --nbr_points 16 --dataset cityscapes --arch resdcn_50 --load_model ../exp/cityscapes/polydet/from101_res50_nofg/model_best.pth
+# python test.py polydet --exp_id from_ctdet_smhg_1cnv_16_pw1_B_TEST --nbr_points 16 --dataset cityscapes --arch smallhourglass --load_model ../exp/cityscapes/polydet/from_ctdet_smhg_1cnv_16_pw1_B/model_best.pth
+
+# python main.py polydet --val_intervals 12 --exp_id from_101_with_fg --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_16_resnetdcn101_l1_no_fg/model_best.pth
+# python test.py polydet --nms --exp_id ffrom_101_with_fg --nbr_points 16 --dataset cityscapes --arch resdcn_101 --load_model ../exp/cityscapes/polydet/from_101_with_fg/model_best.pth
+
+# python main.py polydet --val_intervals 36 --exp_id from_coco_16_101_sl1 --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../models/ctdet_coco_resdcn101.pth
+
+# python main.py polydet --val_intervals 6 --exp_id from101_40pts_sl1 --elliptical_gt --poly_weight 1 --nbr_points 40 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_16_resnetdcn101_l1_no_fg/model_best.pth
+# python main.py polydet --test --val_intervals 6 --exp_id from101_40pts_sl1 --elliptical_gt --poly_weight 1 --nbr_points 40 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --resume
+
+# python main.py polydet --val_intervals 6 --exp_id from101_40pts_l2 --elliptical_gt --poly_weight 1 --nbr_points 40 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_16_resnetdcn101_l1_no_fg/model_best.pth
+# python main.py polydet --test --val_intervals 6 --exp_id from101_40pts_l2 --elliptical_gt --poly_weight 1 --nbr_points 40 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --resume
+
+# python main.py polydet --val_intervals 6 --exp_id from101_40pts --elliptical_gt --poly_weight 1 --nbr_points 40 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_16_resnetdcn101_l1_no_fg/model_best.pth
+# python main.py polydet --test --val_intervals 6 --exp_id from101_40pts --elliptical_gt --poly_weight 1 --nbr_points 40 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --resume
+
+# python main.py polydet --val_intervals 2 --exp_id from101_fg_map --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_16_resnetdcn101_l1_no_fg/model_best.pth
+# python main.py polydet --test --val_intervals 6 --exp_id from101_fg_map --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --resume
+
+# python main.py polydet --val_intervals 12 --exp_id from_101_plus_fg --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_16_resnetdcn101_l1_no_fg/model_best.pth
+# python main.py polydet --test --val_intervals 12 --exp_id from_101_plus_fg --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --resume
+
+# python main.py polydet --val_intervals 6 --exp_id from101_res152_nofg --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_152  --batch_size 4 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_16_resnetdcn101_l1_no_fg/model_best.pth
+
+# python main.py polydet --val_intervals 24 --exp_id fromct_res18_nofg --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_18  --batch_size 28 --lr 2e-4 --load_model ../models/ctdet_coco_resdcn18.pth
+
+
+# python main.py polydet --val_intervals 12 --exp_id from101_res50_nofg --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_50  --batch_size 10 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_16_resnetdcn101_l1_no_fg/model_best.pth
+# python main.py polydet --val_intervals 12 --exp_id from101_res50_nofg --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_50  --batch_size 10 --lr 2e-4 --resume
+
+# python main.py polydet --val_intervals 12 --exp_id from_coco_16_resnetdcn101_l1_no_fg_offsets_from_bbox_with_wh --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../models/ctdet_coco_resdcn101.pth
+# python main.py polydet --val_intervals 12 --exp_id from_coco_16_resnetdcn101_l1_no_fg_offsets_from_bbox_with_wh --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --resume
+
+# RESNET DCN
+# python main.py polydet --val_intervals 6 --exp_id from_coco_16_resnetdcn101_l1_with_fg3 --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_16_resnetdcn101_l1_no_fg/model_best.pth
+
+# python main.py polydet --val_intervals 12 --exp_id from_coco_16_resnetdcn101_l1_no_fg --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../models/ctdet_coco_resdcn101.pth
+# python main.py polydet --test --val_intervals 12 --exp_id from_coco_16_resnetdcn101_l1_no_fg --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_16_resnetdcn101_l1_no_fg/model_best.pth
+# python test.py --nms polydet --exp_id from_coco_16_resnetdcn101_l1_no_fg --nbr_points 16 --dataset cityscapes --arch resdcn_101 --load_model ../exp/cityscapes/polydet/from_coco_16_resnetdcn101_l1_no_fg/model_best.pth
+
+# python main.py polydet --val_intervals 6 --exp_id from_coco_16_resnetdcn101_l2_dense_poly_no_ell --dense_poly --poly_weight 10 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../models/ctdet_coco_resdcn101.pth
+# python main.py polydet --val_intervals 12 --exp_id from_coco_16_resnetdcn101_l2_dense_poly_no_ell --dense_poly --poly_weight 10 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --resume
+# python main.py polydet --val_intervals 24 --exp_id from_coco_16_resnetdcn101_l2_dense_poly_no_ell --dense_poly --poly_weight 10 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --resume
+# python main.py polydet --val_intervals 6 --exp_id from_coco_16_resnetdcn101_freq_l2_dense_poly --dense_poly --elliptical_gt --poly_weight 10 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --resume
+
+# python main.py polydet --val_intervals 6 --exp_id from_coco_16_resnetdcn101_freq_l2 --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../models/ctdet_coco_resdcn101.pth
+# python main.py polydet --val_intervals 6 --exp_id from_coco_16_resnetdcn101_freq_l2 --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --resume
+
+# --eval_oracle_poly
+# python main.py polydet --val_intervals 6 --exp_id from_coco_grid_based_16_resnetdcn101_freq --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --load_model ../models/ctdet_coco_resdcn101.pth
+# python main.py polydet --test --val_intervals 6 --exp_id from_coco_grid_based_16_resnetdcn101_freq --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-4 --resume
+
+
+# python main.py polydet --val_intervals 6 --exp_id from_coco_grid_based_16_resnetdcn101 --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-5 --load_model ../models/ctdet_coco_resdcn101.pth
+# python main.py polydet --val_intervals 24 --exp_id from_coco_grid_based_16_resnetdcn101 --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch resdcn_101  --batch_size 7 --lr 2e-5 --resume
+
+# python main.py polydet --val_intervals 6 --exp_id from_coco_grid_based_B --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_grid_based/model_best.pth
+
+# python main.py polydet --val_intervals 6 --exp_id from_coco_grid_based --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+# python main.py polydet --val_intervals 6 --exp_id from_coco_grid_based --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --resume
+
+# python main.py polydet --val_intervals 6 --exp_id from_old_grid_based --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_ctdet_smhg_1cnv_16_pw1_B/model_best.pth
+# python main.py polydet --val_intervals 6 --exp_id from_old_grid_based --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --resume
+
+# python main.py polydet --val_intervals 6 --exp_id from_old_fg3 --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_ctdet_smhg_1cnv_16_pw1_B/model_best.pth
+# python main.py polydet --val_intervals 6 --exp_id from_old_fg3 --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-6 --resume
+# python main.py polydet --test --val_intervals 6 --exp_id from_old_fg3 --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-6 --load_model ../exp/cityscapes/polydet/from_old_fg3/model_best.pth
+
+# python main.py polydet --val_intervals 6 --exp_id from_coco_smhg_16_rp_l2 --elliptical_gt --poly_weight 0.1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_smhg_16_rp/model_last.pth
+
+# python main.py polydet --val_intervals 24 --exp_id from_coco_smhg_16_rp --elliptical_gt --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+# python main.py polydet --val_intervals 12 --exp_id from_coco_smhg_16_rp --elliptical_gt --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --lr 2e-4 --resume
+
+# python main.py polydet --val_intervals 24 --exp_id from_coco_normalized_l2 --elliptical_gt --poly_weight 1 --depth_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+
+# test with normalized poly and depth
+# python main.py polydet --val_intervals 24 --exp_id from_coco_normalized --elliptical_gt --poly_weight 10 --depth_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+# python main.py polydet --test --val_intervals 24 --exp_id from_coco_normalized --elliptical_gt --poly_weight 10 --depth_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --resume
+
+# python main.py polydet --val_intervals 12 --exp_id from_coco_fg3_16pts --poly_weight 1 --elliptical_gt --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --lr 2e-4  --load_model ../models/ctdet_coco_hg.pth
+# python main.py polydet --test --val_intervals 12 --exp_id from_scratch_fg3_16pts --poly_weight 1 --elliptical_gt --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --lr 2e-4  --resume
+# python test.py polydet --exp_id from_scratch_fg3_16pts --nbr_points 16 --dataset cityscapes --arch smallhourglass --load_model ../exp/cityscapes/polydet/from_scratch_fg3_16pts/model_best.pth
+
+# python main.py polydet --val_intervals 12 --exp_id from_coco_fg3_16pts_freq_mask --poly_weight 1 --elliptical_gt --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+# python main.py polydet --val_intervals 12 --exp_id from_coco_fg3_16pts_freq_mask --poly_weight 1 --elliptical_gt --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --lr 2e-4 --resume
+# python test.py polydet --exp_id from_coco_fg3_16pts_freq_mask --nbr_points 16 --dataset cityscapes --arch smallhourglass --load_model ../exp/cityscapes/polydet/from_coco_fg3_16pts_freq_mask/model_best.pth
+
+# python main.py polydet --val_intervals 12 --exp_id from_coco_fg3_16pts_freq_mask --poly_weight 0.1 --elliptical_gt --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+
+# python main.py polydet --val_intervals 24 --exp_id from_coco_plus_pole_and_sign_32pts --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+
+# python main.py polydet --val_intervals 24 --exp_id from_coco_plus_pole_and_sign_32pts --elliptical_gt --poly_weight 1 --nbr_points 32 --dataset cityscapes --arch smallhourglass  --batch_size 6 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+# python test.py --nms polydet --exp_id from_coco_plus_pole_and_sign_32pts --nbr_points 32 --dataset cityscapes --arch smallhourglass --load_model ../exp/cityscapes/polydet/from_coco_plus_pole_and_sign_32pts/model_best.pth
+# python main.py polydet --test --eval_oracle_poly --exp_id from_coco_plus_pole_and_sign_32pts --elliptical_gt --nbr_points 32 --dataset cityscapes --arch smallhourglass --load_model ../exp/cityscapes/polydet/from_coco_plus_pole_and_sign_32pts/model_best.pth
+
+
+# Main Results Stuff
+# python main.py polydet --val_intervals 24 --exp_id from_ctdet_smhg_1cnv_16_pw1_B --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+# python main.py polydet --val_intervals 24 --exp_id from_ctdet_smhg_1cnv_16_pw1_B --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --resume
+# python main.py polydet --test --val_intervals 24 --exp_id from_ctdet_smhg_1cnv_16_pw1_B --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_ctdet_smhg_1cnv_16_pw1_B/model_best.pth
+# python test.py polydet --exp_id from_ctdet_smhg_1cnv_16_pw1_B_TEST --nbr_points 16 --dataset cityscapes --arch smallhourglass --load_model ../exp/cityscapes/polydet/from_ctdet_smhg_1cnv_16_pw1_B/model_best.pth
+# --eval_oracle_border_hm --eval_oracle_poly
+
+# Ablation Study stuff
+# python main.py polydet --val_intervals 24 --exp_id from_ctdet_smhg_1cnv_32_pw1 --poly_weight 1 --elliptical_gt --nbr_points 32 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+# python main.py polydet --val_intervals 24 --exp_id from_ctdet_smhg_1cnv_32_pw1 --poly_weight 1 --elliptical_gt --nbr_points 32 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --resume
+# python test.py --nms polydet --exp_id from_ctdet_smhg_1cnv_32_pw1 --nbr_points 32 --dataset cityscapes --arch smallhourglass --load_model ../exp/cityscapes/polydet/from_ctdet_smhg_1cnv_32_pw1/model_best.pth
+
+# python main.py polydet --val_intervals 24 --exp_id from_ctdet_smhg_1cnv_64_pw1 --poly_weight 1 --elliptical_gt --nbr_points 64 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+# python test.py --nms polydet --exp_id from_ctdet_smhg_1cnv_64_pw1 --nbr_points 64 --dataset cityscapes --arch smallhourglass --load_model ../exp/cityscapes/polydet/from_ctdet_smhg_1cnv_64_pw1/model_best.pth
+
+# python main.py polydet --val_intervals 24 --exp_id from_ctdet_smhg_1cnv_8_pw1 --poly_weight 1 --elliptical_gt --nbr_points 8 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+# python test.py --nms polydet --exp_id from_ctdet_smhg_1cnv_8_pw1 --nbr_points 8 --dataset cityscapes --arch smallhourglass --load_model ../exp/cityscapes/polydet/from_ctdet_smhg_1cnv_8_pw1/model_best.pth
+
+# python main.py polydet --val_intervals 24 --exp_id from_ctdet_smhg_1cnv_16_pw1_no_ell --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+# python main.py polydet --val_intervals 24 --exp_id from_ctdet_smhg_1cnv_16_pw1_no_ell --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --resume
+
+# python main.py polydet --val_intervals 24 --exp_id from_ctdet_smhg_1cnv_16_pw1_no_cg --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --load_model ../models/ctdet_coco_hg.pth
+# python main.py polydet --val_intervals 24 --exp_id from_ctdet_smhg_1cnv_16_pw1_no_cg --elliptical_gt --poly_weight 1 --nbr_points 16 --dataset cityscapes --arch smallhourglass  --batch_size 6 --master_batch 4 --lr 2e-4 --resume
+# python test.py polydet --exp_id from_ctdet_smhg_1cnv_16_pw1_no_cg --nbr_points 16 --dataset cityscapes --arch smallhourglass --load_model ../exp/cityscapes/polydet/from_ctdet_smhg_1cnv_16_pw1_no_cg/model_best.pth
+
+# ResNet Stuff
+# python main.py polydet --val_intervals 24 --exp_id resnet18_32pts --poly_weight 1 --elliptical_gt --nbr_points 32 --dataset cityscapes --arch res_18  --batch_size 16 --master_batch 4 --lr 2e-4
+# python main.py polydet --val_intervals 24 --exp_id resnet18_32pts_2 --poly_weight 1 --elliptical_gt --nbr_points 32 --dataset cityscapes --arch res_18  --batch_size 16 --master_batch 4 --lr 2e-4 --load_model ../exp/cityscapes/polydet/resnet18_32pts/model_best.pth
+# python test.py polydet --exp_id resnet18_32pts_2 --nbr_points 32 --dataset cityscapes --arch res_18  --batch_size 16 --load_model ../exp/cityscapes/polydet/resnet18_32pts_2/model_best.pth
+
+# DLA Stuff
+# python main.py polydet --val_intervals 24 --exp_id from_coco_dla --poly_weight 1 --elliptical_gt --nbr_points 16 --dataset cityscapes --arch dlav0_34  --batch_size 8 --master_batch 4 --lr 2e-4
+# python main.py polydet --test --eval_oracle_hm --eval_oracle_wh --eval_oracle_fg --eval_oracle_poly --eval_oracle_pseudo_depth --eval_oracle_offset --val_intervals 24 --exp_id from_coco_dla --poly_weight 1 --elliptical_gt --nbr_points 40 --dataset cityscapes --arch dlav0_34  --batch_size 8 --lr 2e-4 --load_model ../exp/cityscapes/polydet/from_coco_dla/model_best.pth
+# python test.py --nms polydet --exp_id from_coco_dla --nbr_points 16 --dataset cityscapes --arch dlav0_34 --load_model ../exp/cityscapes/polydet/from_coco_dla/model_best.pth
+
+# python main.py polydet --val_intervals 10 --exp_id resnet101_32pts --poly_weight 1 --elliptical_gt --nbr_points 32 --dataset cityscapes --arch res_101  --batch_size 6 --lr 2e-4
+# python main.py polydet --val_intervals 10 --exp_id resnet101_32pts --poly_weight 1 --elliptical_gt --nbr_points 32 --dataset cityscapes --arch res_101  --batch_size 6 --lr 2e-4 --resume

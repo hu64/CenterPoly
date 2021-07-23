@@ -498,12 +498,15 @@ def ctdet_decode(heat, wh, reg=None, cat_spec_wh=False, K=100):
 
 def polydet_decode(heat, polys, depth, reg=None, cat_spec_poly=False, K=100):
     batch, cat, height, width = heat.size()
+    nbr_points = int(polys.shape[-1])
 
     # heat = torch.sigmoid(heat)
     # perform nms on heatmaps
     heat = _nms(heat)
-
+    # border_heat = _nms(border_hm)
     scores, inds, clses, ys, xs = _topk(heat, K=K)
+    # border_scores, border_inds, border_clses, border_ys, border_xs = _topk(border_heat, K=nbr_points*K)
+
     if reg is not None:
       reg = _transpose_and_gather_feat(reg, inds)
       reg = reg.view(batch, K, 2)
@@ -514,8 +517,8 @@ def polydet_decode(heat, polys, depth, reg=None, cat_spec_poly=False, K=100):
       ys = ys.view(batch, K, 1) + 0.5
     polys = _transpose_and_gather_feat(polys, inds)
     depth = _transpose_and_gather_feat(depth, inds)
+    # wh = _transpose_and_gather_feat(wh, inds)
     if cat_spec_poly:
-        nbr_points = int(polys.shape[-1]/cat)
         polys = polys.view(batch, K, cat, nbr_points)
         clses_ind = clses.view(batch, K, 1, 1).expand(batch, K, 1, nbr_points).long()
         polys = polys.gather(2, clses_ind).view(batch, K, nbr_points)
@@ -525,10 +528,64 @@ def polydet_decode(heat, polys, depth, reg=None, cat_spec_poly=False, K=100):
     depth = depth.view(batch, K, 1).float()
     clses  = clses.view(batch, K, 1).float()
     scores = scores.view(batch, K, 1)
+    # bboxes = torch.cat([xs - wh[..., 0:1] / 2,
+    #                     ys - wh[..., 1:2] / 2,
+    #                     xs + wh[..., 0:1] / 2,
+    #                     ys + wh[..., 1:2] / 2], dim=2)
 
+    # print('decode poly: ', polys[0, ...], ' w ', width, ' h ', height)
+    # polys /= 1000
+    # polys[..., 0::2] = (polys[..., 0::2] * width) + xs
+    # polys[..., 1::2] = (polys[..., 1::2] * height) + ys
+
+    # x_intervals = (bboxes[..., 2] - bboxes[..., 0]) / 4
+    # y_intervals = (bboxes[..., 3] - bboxes[..., 1]) / 4
+    # x_boxes = torch.cat([
+    #                     bboxes[..., 0] + (0 * x_intervals),
+    #                     bboxes[..., 0] + (1 * x_intervals),
+    #                     bboxes[..., 0] + (2 * x_intervals),
+    #                     bboxes[..., 0] + (3 * x_intervals),
+    #                     bboxes[..., 2], bboxes[..., 2], bboxes[..., 2], bboxes[..., 2],
+    #                     bboxes[..., 2] - (0 * x_intervals),
+    #                     bboxes[..., 2] - (1 * x_intervals),
+    #                     bboxes[..., 2] - (2 * x_intervals),
+    #                     bboxes[..., 2] - (3 * x_intervals),
+    #                     bboxes[..., 0], bboxes[..., 0], bboxes[..., 0], bboxes[..., 0],
+    #                    ])
+    # y_boxes = torch.cat([
+    #                     bboxes[..., 1], bboxes[..., 1], bboxes[..., 1], bboxes[..., 1],
+    #                     bboxes[..., 1] + 0 * y_intervals,
+    #                     bboxes[..., 1] + 1 * y_intervals,
+    #                     bboxes[..., 1] + 2 * y_intervals,
+    #                     bboxes[..., 1] + 3 * y_intervals,
+    #                     bboxes[..., 3], bboxes[..., 3], bboxes[..., 3], bboxes[..., 3],
+    #                     bboxes[..., 3] - 0 * y_intervals,
+    #                     bboxes[..., 3] - 1 * y_intervals,
+    #                     bboxes[..., 3] - 2 * y_intervals,
+    #                     bboxes[..., 3] - 3 * y_intervals,
+    #                    ])
     polys[..., 0::2] += xs
     polys[..., 1::2] += ys
+    # print(polys[..., 0::2].shape, x_boxes.transpose(1, 0).shape)
 
+    # polys[..., 0::2] += x_boxes.transpose(1, 0)
+    # polys[..., 1::2] += y_boxes.transpose(1, 0)
+
+    # edge_points = torch.cat([border_xs, border_ys]).cpu()
+
+    # def closest_node(node, nodes=edge_points):
+    #     nodes = np.asarray(nodes)
+    #     dist_2 = np.sum((nodes.T - np.expand_dims(node, axis=-1).T) ** 2, axis=1)
+    #     return nodes.T[np.argmin(dist_2)] if np.min(dist_2) < 3 else node # if np.linalg.norm(node - nodes.T[np.argmin(dist_2)]) < 5 else node
+
+    # polys = np.array(polys.detach().cpu())
+    # poly_points = np.stack([polys[..., 0::2], polys[..., 1::2]], axis=-1)
+    # poly_points = np.apply_along_axis(closest_node, -1, poly_points)
+    # polys[..., 0::2] = poly_points[..., 0]
+    # polys[..., 1::2] = poly_points[..., 1]
+    # polys = torch.tensor(polys).cuda()
+
+    ###########################################
     poly_xs = polys[..., 0::2].clone().detach()
     poly_ys = polys[..., 1::2].clone().detach()
 
@@ -542,6 +599,7 @@ def polydet_decode(heat, polys, depth, reg=None, cat_spec_poly=False, K=100):
                         poly_ys_min,
                         poly_xs_max,
                         poly_ys_max], dim=2)
+    #############################################
 
     # for i in range(0, polys.shape[-1], 2):
     #     poly_points.append(xs + polys[..., i:i+1])
