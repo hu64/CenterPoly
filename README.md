@@ -14,6 +14,11 @@ The bounding polygons      |  The relative depthmap
 :-------------------------:|:-------------------------:
 ![](imgs/berlin_i.png)  |  ![](imgs/berlin_d.png)
 
+## Model
+![Model](imgs/CenterPolyFigure.jpg "")
+
+An overview of the CenterPoly architecture. The image first passes through a CNN backbone, displayed here as an Hourglass network. The feature map is then shared between four network heads, the polygon regression head, the center heatmaps head used for detections, the object offset head and the relative depth map head. The sizes displayed are for illustration purposes only, please refer to the code for the detailed architecture.
+
 ## Requirements:
 - pytorch (we run 1.4.0, cuda 10.0)
 - various common packages
