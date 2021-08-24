@@ -1,3 +1,6 @@
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/centerpoly-real-time-instance-segmentation/real-time-instance-segmentation-on-cityscapes)](https://paperswithcode.com/sota/real-time-instance-segmentation-on-cityscapes?p=centerpoly-real-time-instance-segmentation) <br>
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/centerpoly-real-time-instance-segmentation/real-time-instance-segmentation-on-kitti)](https://paperswithcode.com/sota/real-time-instance-segmentation-on-kitti?p=centerpoly-real-time-instance-segmentation) <br>
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/centerpoly-real-time-instance-segmentation/real-time-instance-segmentation-on-india)](https://paperswithcode.com/sota/real-time-instance-segmentation-on-india?p=centerpoly-real-time-instance-segmentation) <br>
 # CenterPoly
 Repository for the paper CenterPoly: real-time instance segmentation using bounding polygons
 <br> by Hughes Perreault<sup>1</sup>, Guillaume-Alexandre Bilodeau<sup>1</sup>, Nicolas Saunier<sup>1</sup> and Maguelonne Héritier<sup>2</sup>.
