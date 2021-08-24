@@ -1,9 +1,15 @@
+# CenterPoly
+Repository for the paper CenterPoly: real-time instance segmentation using bounding polygons
 <br> by Hughes Perreault<sup>1</sup>, Guillaume-Alexandre Bilodeau<sup>1</sup>, Nicolas Saunier<sup>1</sup> and Maguelonne Héritier<sup>2</sup>.
 <br>
 <sup>1</sup> Polytechnique Montréal
 <sup>2</sup> Genetec <br>
+Paper: https://arxiv.org/abs/2002.05540 <br>
 
-Requirements:
+## Abstract
+We present a novel method, called CenterPoly, for real-time instance segmentation using bounding polygons. We apply it to detect road users in dense urban environments, making it suitable for applications in intelligent transportation systems like automated vehicles. CenterPoly detects objects by their center keypoint while predicting a fixed number of polygon vertices for each object, thus performing detection and segmentation in parallel. Most of the network parameters are shared by the network heads, making it fast and lightweight enough to run at real-time speed. To properly convert mask ground-truth to polygon ground-truth, we designed a vertex selection strategy to facilitate the learning of the polygons. Additionally, to better segment overlapping objects in dense urban scenes, we also train a relative depth branch to determine which instances are closer and which are further, using available weak annotations. We propose several models with different backbones to show the possible speed / accuracy trade-offs. The models were trained and evaluated on Cityscapes, KITTI and IDD and the results are reported on their public benchmark, which are state-of-the-art at real-time speeds. Code is available at https://github.com/hu64/CenterPoly.
+
+## Requirements:
 - pytorch (we run 1.4.0, cuda 10.0)
 - various common packages
 
@@ -26,6 +32,9 @@ For general debugging and help to run the scripts: <br>
 - results on cityscapes: https://www.cityscapes-dataset.com/benchmarks/#instance-level-results
 - results on KITTI: http://www.cvlibs.net/datasets/kitti/eval_instance_seg_detail.php?benchmark=instanceSeg2015&result=37b10ad4af975da6ef9cff646935bc47dce3d0ce
 - results on IDD:(Anonymous with corresponding numbers) https://idd.insaan.iiit.ac.in/evaluation/leader-board/
+
+## Model Zoo
+https://polymtlca0-my.sharepoint.com/:f:/g/personal/hughes_perreault_polymtl_ca/ErIRGwMAd0lPvBxTtybUjWMBnvvqh8mNkWnaJLojlkyOWQ?e=yNjlDU
 
 ## Acknowledgements
 
